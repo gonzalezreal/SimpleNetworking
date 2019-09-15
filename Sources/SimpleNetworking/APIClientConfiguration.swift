@@ -1,6 +1,11 @@
 import Foundation
 
 public struct APIClientConfiguration {
-    public let additionalHeaders: [HeaderField: String]
-    public let additionalQueryParameters: [String: String]
+    public var additionalHeaders: [HeaderField: String]
+    public var additionalQueryParameters: [String: String]
+
+    public init(additionalHeaders: [HeaderField: String] = [:], additionalQueryParameters: [String: String] = [:]) {
+        self.additionalHeaders = additionalHeaders
+        self.additionalQueryParameters = additionalQueryParameters
+    }
 }

@@ -7,7 +7,7 @@ public class APIClient {
 
     private let session: URLSession
 
-    public init(baseURL: URL, configuration: APIClientConfiguration, session: URLSession = URLSession(configuration: .default)) {
+    public init(baseURL: URL, configuration: APIClientConfiguration = APIClientConfiguration(), session: URLSession = URLSession(configuration: .default)) {
         self.baseURL = baseURL
         self.configuration = configuration
         self.session = session
