@@ -5,7 +5,7 @@ final class URLRequestAdditionsTest: XCTestCase {
     func testAnyRequestAddingQueryReturnsExpectedRequest() {
         // given
         let anyRequest = URLRequest(url: Fixtures.anyURLWithPath("test", query: "foo=bar"))
-        let expected = URLRequest(url: Fixtures.anyURLWithPath("test", query: "foo=bar&baz=qux"))
+        let expected = URLRequest(url: Fixtures.anyURLWithPath("test", query: "baz=qux&foo=bar"))
 
         // when
         let result = anyRequest.addingQueryParameters(["baz": "qux"])

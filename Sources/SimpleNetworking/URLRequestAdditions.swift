@@ -7,7 +7,7 @@ extension URLRequest {
         var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
 
         if !endpoint.queryParameters.isEmpty {
-            components.queryItems = endpoint.queryParameters.map(URLQueryItem.init)
+            components.queryItems = endpoint.queryParameters.sorted { $0.key < $1.key }.map(URLQueryItem.init)
         }
 
         self.init(url: components.url!)
@@ -24,8 +24,9 @@ extension URLRequest {
         guard !parameters.isEmpty else { return self }
 
         var components = URLComponents(url: url!, resolvingAgainstBaseURL: false)!
-        components.queryItems = components.queryItems ?? []
-        components.queryItems?.append(contentsOf: parameters.map(URLQueryItem.init))
+        
+        let queryItems = (components.queryItems ?? []) + parameters.map(URLQueryItem.init)
+        components.queryItems = queryItems.sorted { $0.name < $1.name }
 
         var result = self
         result.url = components.url
