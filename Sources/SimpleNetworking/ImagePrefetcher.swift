@@ -1,4 +1,4 @@
-#if os(iOS) || os(tvOS)
+#if canImport(UIKit)
     import Foundation
     import UIKit
 
@@ -8,7 +8,7 @@
 
         private var tasks: [URL: URLSessionDataTask] = [:]
 
-        public init(session: URLSession = .imageSession, imageCache: MemoryImageCache = .shared) {
+        public init(session: URLSession = .sharedImage, imageCache: MemoryImageCache = .shared) {
             self.session = session
             self.imageCache = imageCache
         }

@@ -44,12 +44,3 @@ public final class HTTPStubProtocol: URLProtocol {
 
     public override func stopLoading() {}
 }
-
-public extension URLSession {
-    static var stubbed: URLSession {
-        let configuration = URLSessionConfiguration.default
-        configuration.protocolClasses = [HTTPStubProtocol.self]
-
-        return URLSession(configuration: configuration)
-    }
-}

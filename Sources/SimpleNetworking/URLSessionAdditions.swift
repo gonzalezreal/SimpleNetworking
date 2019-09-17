@@ -7,7 +7,7 @@ extension URLSession {
         static let timeoutInterval: TimeInterval = 15
     }
 
-    public static let imageSession: URLSession = {
+    public static let sharedImage: URLSession = {
         let configuration = URLSessionConfiguration.default
         configuration.requestCachePolicy = .returnCacheDataElseLoad
         configuration.urlCache = URLCache(memoryCapacity: Constants.memoryCapacity, diskCapacity: Constants.diskCapacity)
@@ -16,4 +16,11 @@ extension URLSession {
 
         return URLSession(configuration: configuration)
     }()
+    
+    public static var stubbed: URLSession {
+        let configuration = URLSessionConfiguration.default
+        configuration.protocolClasses = [HTTPStubProtocol.self]
+
+        return URLSession(configuration: configuration)
+    }
 }

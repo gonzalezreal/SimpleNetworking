@@ -1,4 +1,4 @@
-#if os(iOS) || os(tvOS)
+#if canImport(UIKit)
     import Combine
     import Foundation
     import UIKit
@@ -7,7 +7,7 @@
         public let session: URLSession
         public let imageCache: MemoryImageCache
 
-        public init(session: URLSession = .imageSession, imageCache: MemoryImageCache = .shared) {
+        public init(session: URLSession = .sharedImage, imageCache: MemoryImageCache = .shared) {
             self.session = session
             self.imageCache = imageCache
         }
