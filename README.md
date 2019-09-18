@@ -10,6 +10,14 @@ It also includes other goodies, like image downloading and caching, and network 
 
 Let's explore all the features using [The Movie Database API](https://developers.themoviedb.org/3) as an example.
 
+- [Creating Endpoints](#creating-endpoints)
+- [Configuring API clients](#configuring-api-clients)
+- [Combining and transforming responses](#combining-and-transforming-responses)
+- [Downloading images](#downloading-images)
+- [Stubbing network requests](#stubbing-network-requests)
+- [Installation](#installation)
+- [Help & Feedback](#help--feedback)
+
 ## Creating Endpoints
 The `Endpoint` struct encapsulates an API request as well as the result type of the responses for that request.
 
