@@ -169,7 +169,29 @@ extension MovieListViewController: UICollectionViewDataSourcePrefetching {
 ```
 
 ## Stubbing network requests
-Provide an example to stub a network request.
+Stubbing network requests can be useful when you are writing UI or integration tests and don't want to depend on the network being reachable.
+
+You can use `HTTPStubProtocol` to stub a network request as follows:
+
+```Swift
+var request = URLRequest(url: Fixtures.anyURLWithPath("user", query: "api_key=test"))
+request.addValue(ContentType.json.rawValue, forHTTPHeaderField: HeaderField.accept.rawValue)
+request.addValue("Bearer 3xpo", forHTTPHeaderField: HeaderField.authorization.rawValue)
+
+HTTPStubProtocol.stubRequest(request, data: Fixtures.anyJSON, statusCode: 200)
+```
+
+For this to have the desired effect, you need to pass `URLSession.stubbed` as a parameter when constructing the `APIClient`.
+
+```Swift
+override func setUp() {
+    super.setUp()
+
+    sut = APIClient(baseURL: Fixtures.anyBaseURL, configuration: configuration, session: .stubbed)
+}
+```
+
+You can check out [`APIClientTest`](Tests/SimpleNetworkingTests/APIClientTest.swift) for more information.
 
 ## Installation
 **Using the Swift Package Manager**
