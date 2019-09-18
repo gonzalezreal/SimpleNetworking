@@ -58,7 +58,6 @@ You can customize many properties of an `Endpoint`: headers, query parameters, b
 
 ```Swift
 extension Endpoint where Output == Page<MovieResult> {
-    // Popular movies
     static func popularMovies(page: Int) -> Endpoint {
         return Endpoint(method: .get,
                         path: "movie/popular",
@@ -68,7 +67,6 @@ extension Endpoint where Output == Page<MovieResult> {
 }
 
 extension Endpoint where Output == Session {
-    // Create session
     static func session(with token: Token) -> Endpoint {
         return Endpoint(method: .post,
                         path: "authentication/session/new",
@@ -78,10 +76,57 @@ extension Endpoint where Output == Session {
 ```
 
 ## Configuring API clients
-Configuring additional headers and query parameters. Creating the API client with a base url.
+When creating an API client, you must specify a base URL and, optionally, the additional headers and query parameters that go with each request.
+
+```Swift
+extension APIClient {
+    static func theMovieDb(apiKey: String, language: String) -> APIClient {
+        var configuration = APIClientConfiguration()
+        configuration.additionalQueryParameters = [
+            "api_key": apiKey,
+            "language": language,
+        ]
+        return APIClient(baseURL: URL(string: "https://api.themoviedb.org/3")!, configuration: configuration)
+    }
+}
+```
 
 ## Combining and transforming responses
-Zip configuration, genres and popular movies / transform into a view model.
+Since `APIClient.response(from:)` method returns a [`Publisher`](https://developer.apple.com/documentation/combine/publisher), it is quite simple to combine responses and transform them for presentation.
+
+Consider, for example, that we have to present a list of popular movies; including their title, genre, and cover. To build that list we need information from three different endpoints:
+* `.configuration`, to obtain the image base URL.
+* `.movieGenres`, to obtain the movie genres by id.
+* `.popularMovies(page:)`, to obtain the list of movies sorted by popularity.
+
+We could model an item in that list as follows:
+
+```Swift
+struct MovieItem {
+    let title: String
+    let genres: String
+    let posterURL: URL?
+    
+    init(movieResult: MovieResult, imageBaseURL: URL, movieGenres: GenreList) {
+        ...
+    }
+}
+```
+
+To build the list, we can use the `zip` operator with the publishers returned by the `APIClient`.
+
+```Swift
+func popularItems() -> AnyPublisher<[MovieItem], Error> {
+    return Publishers.Zip3(theMovieDbClient.response(for: .popularMovies(page: 1)),
+                           theMovieDbClient.response(for: .configuration),
+                           theMovieDbClient.response(for: .movieGenres))
+        .map { (page, config, genres) -> [MovieItem] in
+            let url = config.images.secureBaseURL
+            return page.results.map { MovieItem(movieResult: $0, imageBaseURL: url, movieGenres: genres) }
+        }
+        .eraseToAnyPublisher()
+}
+```
 
 ## Downloading images
 Downloading and prefetching / transforming images. prepareForReuse.
@@ -92,7 +137,7 @@ Provide an example to stub a network request.
 ## Installation
 **Using the Swift Package Manager**
 
-Add Reusable as a dependency to your `Package.swift` file. For more information, see the [Swift Package Manager documentation](https://github.com/apple/swift-package-manager/tree/master/Documentation).
+Add SimpleNetworking as a dependency to your `Package.swift` file. For more information, see the [Swift Package Manager documentation](https://github.com/apple/swift-package-manager/tree/master/Documentation).
 
 ```
 .package(url: "https://github.com/gonzalezreal/SimpleNetworking", from: "1.0.0")
