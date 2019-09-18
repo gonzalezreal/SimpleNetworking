@@ -129,7 +129,44 @@ func popularItems() -> AnyPublisher<[MovieItem], Error> {
 ```
 
 ## Downloading images
-Downloading and prefetching / transforming images. prepareForReuse.
+You can use `ImageDownloader` to download images in your views and take advantage of Combine operators to apply transformations to them. `ImageDownloader` leverages the foundation [`URLCache`](https://developer.apple.com/documentation/foundation/urlcache), providing a persistent disk cache and two in-memory caches.
+
+```Swift
+class MovieItemCell: UICollectionViewCell {
+    // ...
+    private lazy var imageView = ImageView()
+    private let imageDownloader = ImageDownloader()
+    private var cancellable: AnyCancellable?
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        cancellable?.cancel()
+    }
+    
+    func configure(with movieItem: MovieItem) {
+        // ...
+        cancellable = imageDownloader.image(withURL: movieItem.posterURL)
+            .map { $0.applyFancyEffect() }
+            .replaceError(with: placeholderImage)
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.image, on: imageView)
+    }
+}
+```
+
+You can also preload images and warm the caches up by using an instance of `ImagePrefetcher`.
+
+```Swift
+extension MovieListViewController: UICollectionViewDataSourcePrefetching {
+    func collectionView(_: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
+        imagePrefetcher.prefetchImages(with: imageURLs(at: indexPaths))
+    }
+
+    func collectionView(_: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
+        imagePrefetcher.cancelPrefetchingImages(with: imageURLs(at: indexPaths))
+    }
+}
+```
 
 ## Stubbing network requests
 Provide an example to stub a network request.
