@@ -137,7 +137,7 @@ func popularItems() -> AnyPublisher<[MovieItem], Error> {
 ```
 
 ## Downloading images
-You can use `ImageDownloader` to download images in your views and take advantage of Combine operators to apply transformations to them. `ImageDownloader` leverages the foundation [`URLCache`](https://developer.apple.com/documentation/foundation/urlcache), providing a persistent disk cache and two in-memory caches.
+You can use `ImageDownloader` to download images in your views and take advantage of Combine operators to apply transformations to them. `ImageDownloader` leverages the foundation [`URLCache`](https://developer.apple.com/documentation/foundation/urlcache), providing persistent and in-memory caches.
 
 ```Swift
 class MovieItemCell: UICollectionViewCell {

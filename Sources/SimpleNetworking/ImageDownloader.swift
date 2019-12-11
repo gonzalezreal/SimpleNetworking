@@ -5,30 +5,29 @@
 
     public final class ImageDownloader {
         public let session: URLSession
-        public let imageCache: MemoryImageCache
+        public let immediateCache = ImmediateCache.shared
 
-        public init(session: URLSession = .sharedImage, imageCache: MemoryImageCache = .shared) {
+        public init(session: URLSession = .sharedImage) {
             self.session = session
-            self.imageCache = imageCache
         }
 
         public func image(withURL url: URL) -> AnyPublisher<UIImage, Error> {
-            if let image = imageCache.image(for: url) {
+            if let image = immediateCache.image(for: url) {
                 return Just(image).setFailureType(to: Error.self).eraseToAnyPublisher()
             } else {
                 return session.dataTaskPublisher(for: url)
-                    .tryMap { data, response in
+                    .tryMap { [immediateCache] data, response in
                         let httpResponse = response as! HTTPURLResponse
 
                         guard 200 ..< 300 ~= httpResponse.statusCode else {
                             throw BadStatusError(data: data, response: httpResponse)
                         }
 
-                        return try UIImage.makeImage(with: data)
+                        let image = try UIImage.makeImage(with: data)
+                        immediateCache.setImage(image, for: url)
+
+                        return image
                     }
-                    .handleEvents(receiveOutput: { [imageCache] image in
-                        imageCache.setImage(image, for: url)
-                    })
                     .eraseToAnyPublisher()
             }
         }
