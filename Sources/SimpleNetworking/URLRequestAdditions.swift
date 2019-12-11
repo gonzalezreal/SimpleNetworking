@@ -24,7 +24,7 @@ extension URLRequest {
         guard !parameters.isEmpty else { return self }
 
         var components = URLComponents(url: url!, resolvingAgainstBaseURL: false)!
-        
+
         let queryItems = (components.queryItems ?? []) + parameters.map(URLQueryItem.init)
         components.queryItems = queryItems.sorted { $0.name < $1.name }
 

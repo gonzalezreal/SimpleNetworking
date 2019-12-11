@@ -16,7 +16,7 @@ extension URLSession {
 
         return URLSession(configuration: configuration)
     }()
-    
+
     public static var stubbed: URLSession {
         let configuration = URLSessionConfiguration.default
         configuration.protocolClasses = [HTTPStubProtocol.self]
