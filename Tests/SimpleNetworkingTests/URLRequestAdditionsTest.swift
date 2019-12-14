@@ -65,9 +65,7 @@ final class URLRequestAdditionsTest: XCTestCase {
         var anyRequest = URLRequest(url: Fixtures.anyURLWithPath("test"))
         anyRequest.httpMethod = "POST"
         anyRequest.httpBody = """
-        {
-            "foo": "bar"
-        }
+        {"foo": "bar"}
         """.data(using: .utf8)
         anyRequest.addValue(ContentType.json.rawValue, forHTTPHeaderField: HeaderField.contentType.rawValue)
         let expected = """
@@ -76,7 +74,7 @@ final class URLRequestAdditionsTest: XCTestCase {
          │ Content-Type: application/json
          ├─ Body
          │ {
-         │     "foo": "bar"
+         │   "foo" : "bar"
          │ }
         """
 
