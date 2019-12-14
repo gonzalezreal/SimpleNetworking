@@ -15,15 +15,11 @@ let package = Package(
             targets: ["SimpleNetworking"]
         ),
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/apple/swift-log", from: "1.2.0"),
+    ],
     targets: [
-        .target(
-            name: "SimpleNetworking",
-            dependencies: []
-        ),
-        .testTarget(
-            name: "SimpleNetworkingTests",
-            dependencies: ["SimpleNetworking"]
-        ),
+        .target(name: "SimpleNetworking", dependencies: ["Logging"]),
+        .testTarget(name: "SimpleNetworkingTests", dependencies: ["SimpleNetworking"]),
     ]
 )

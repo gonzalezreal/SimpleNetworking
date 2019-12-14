@@ -1,6 +1,20 @@
 import Foundation
 
 extension URLRequest {
+    internal var logDescription: String {
+        var result = "[REQUEST] \(httpMethod!) \(url!)"
+
+        if let logDescription = allHTTPHeaderFields?.logDescription, !logDescription.isEmpty {
+            result += "\n ├─ Headers\n\(logDescription)"
+        }
+
+        if let logDescription = httpBody?.logDescription, !logDescription.isEmpty {
+            result += "\n ├─ Body\n\(logDescription)"
+        }
+
+        return result
+    }
+
     public init<Output>(baseURL: URL, endpoint: Endpoint<Output>) {
         let url = baseURL.appendingPathComponent(endpoint.path)
 
