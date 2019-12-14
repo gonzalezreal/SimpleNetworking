@@ -13,9 +13,9 @@ final class HTTPURLResponseAdditionsTest: XCTestCase {
          ├─ Headers
          │ Content-Type: application/json;charset=utf-8
          ├─ Content
-         │ {
-         │   "name" : "gonzalezreal"
-         │ }
+          {
+            "name" : "gonzalezreal"
+          }
         """
 
         // when

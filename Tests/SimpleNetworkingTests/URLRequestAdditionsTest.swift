@@ -73,9 +73,9 @@ final class URLRequestAdditionsTest: XCTestCase {
          ├─ Headers
          │ Content-Type: application/json
          ├─ Body
-         │ {
-         │   "foo" : "bar"
-         │ }
+          {
+            "foo" : "bar"
+          }
         """
 
         // when

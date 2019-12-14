@@ -5,7 +5,7 @@ internal extension Data {
         String(data: prettyPrintedJSON ?? self, encoding: .utf8).map {
             $0.components(separatedBy: .newlines)
                 .filter { !$0.isEmpty }
-                .map { " │ \($0)" }
+                .map { "  \($0)" }
                 .joined(separator: "\n")
         } ?? ""
     }
