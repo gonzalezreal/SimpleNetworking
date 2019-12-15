@@ -179,7 +179,7 @@ Here is an example of the output using the default `StreamLogHandler`:
  ...
 ```
 
-If you want to use [Apple's Unified Logging](https://developer.apple.com/documentation/os/logging) for your logs, you might want to use the [UnifiedLogHandler](https://github.com/gonzalezreal/UnifiedLogging).
+If you want to use [Apple's Unified Logging](https://developer.apple.com/documentation/os/logging) for your logs, you might want to try [UnifiedLogHandler](https://github.com/gonzalezreal/UnifiedLogging).
 
 ## Downloading images
 You can use `ImageDownloader` to download images in your views and take advantage of Combine operators to apply transformations to them. `ImageDownloader` leverages the foundation [`URLCache`](https://developer.apple.com/documentation/foundation/urlcache), providing persistent and in-memory caches.
