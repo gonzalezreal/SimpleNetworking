@@ -13,11 +13,6 @@ public class APIClient {
         self.baseURL = baseURL
         self.configuration = configuration
         self.session = session
-        #if DEBUG
-            logger.logLevel = .debug
-        #else
-            logger.logLevel = .info
-        #endif
     }
 
     public func response<Output>(for endpoint: Endpoint<Output>) -> AnyPublisher<Output, Error> {
