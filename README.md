@@ -13,6 +13,7 @@ Let's explore all the features using [The Movie Database API](https://developers
 - [Creating Endpoints](#creating-endpoints)
 - [Configuring API clients](#configuring-api-clients)
 - [Combining and transforming responses](#combining-and-transforming-responses)
+- [Logging](#logging)
 - [Downloading images](#downloading-images)
 - [Stubbing network requests](#stubbing-network-requests)
 - [Installation](#installation)
@@ -135,6 +136,50 @@ func popularItems() -> AnyPublisher<[MovieItem], Error> {
         .eraseToAnyPublisher()
 }
 ```
+
+## Logging
+The `APIClient` class uses [SwiftLog](https://github.com/apple/swift-log) to log requests and responses. If you set its `logger.logLevel` to `.debug` you will start seeing requests and responses as they happen in your logs.
+
+```Swift
+let apiClient = APIClient(baseURL: URL(string: "https://api.themoviedb.org/3")!)
+apiClient.logger.logLevel = .debug
+```
+
+Here is an example of the output using the default `StreamLogHandler`:
+
+```
+2019-12-15T17:18:47+0100 debug: [REQUEST] GET https://api.themoviedb.org/3/genre/movie/list?language=en
+├─ Headers
+│ Accept: application/json
+2019-12-15T17:18:47+0100 debug: [RESPONSE] 200 https://api.themoviedb.org/3/genre/movie/list?language=en
+├─ Headers
+│ access-control-expose-headers: ETag, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, Retry-After, Content-Length, Content-Range
+│ Content-Type: application/json;charset=utf-8
+│ x-ratelimit-reset: 1576426582
+│ Server: openresty
+│ Etag: "df2617d2ab5d0c85ceff5098b8ab70c4"
+│ Cache-Control: public, max-age=28800
+│ access-control-allow-methods: GET, HEAD, POST, PUT, DELETE, OPTIONS
+│ Access-Control-Allow-Origin: *
+│ Date: Sun, 15 Dec 2019 16:16:14 GMT
+│ x-ratelimit-remaining: 39
+│ Content-Length: 547
+│ x-ratelimit-limit: 40
+├─ Content
+ {
+   "genres" : [
+     {
+       "id" : 28,
+       "name" : "Action"
+     },
+     {
+       "id" : 12,
+       "name" : "Adventure"
+     },
+ ...
+```
+
+If you want to use [Apple's Unified Logging](https://developer.apple.com/documentation/os/logging) for your logs, you might want to use the [UnifiedLogHandler](https://github.com/gonzalezreal/UnifiedLogging).
 
 ## Downloading images
 You can use `ImageDownloader` to download images in your views and take advantage of Combine operators to apply transformations to them. `ImageDownloader` leverages the foundation [`URLCache`](https://developer.apple.com/documentation/foundation/urlcache), providing persistent and in-memory caches.
