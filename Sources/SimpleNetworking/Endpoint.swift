@@ -59,7 +59,7 @@ public extension Endpoint where Output == Void {
 }
 
 private func decode<Output: Decodable>(with dateDecodingStrategy: JSONDecoder.DateDecodingStrategy) -> (Data) throws -> Output {
-    return { data in
+    { data in
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = dateDecodingStrategy
         return try decoder.decode(Output.self, from: data)

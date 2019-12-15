@@ -1,9 +1,11 @@
 import Combine
 import Foundation
+import Logging
 
 public class APIClient {
     public let baseURL: URL
     public let configuration: APIClientConfiguration
+    public var logger = Logger(label: "APIClient")
 
     private let session: URLSession
 
@@ -18,9 +20,13 @@ public class APIClient {
             .addingHeaders(configuration.additionalHeaders)
             .addingQueryParameters(configuration.additionalQueryParameters)
 
+        logger.debug("\(request.logDescription)")
+
         return session.dataTaskPublisher(for: request)
-            .tryMap { data, response in
+            .tryMap { [logger] data, response in
                 let httpResponse = response as! HTTPURLResponse
+
+                logger.debug("\(httpResponse.logDescription(content: data.logDescription))")
 
                 guard 200 ..< 300 ~= httpResponse.statusCode else {
                     throw BadStatusError(data: data, response: httpResponse)

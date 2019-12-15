@@ -7,7 +7,7 @@
         private let cache = NSCache<NSURL, UIImage>()
 
         public func image(for url: URL) -> UIImage? {
-            return cache.object(forKey: url as NSURL)
+            cache.object(forKey: url as NSURL)
         }
 
         public func setImage(_ image: UIImage, for url: URL) {

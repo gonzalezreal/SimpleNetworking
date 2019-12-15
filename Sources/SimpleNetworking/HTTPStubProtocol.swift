@@ -21,15 +21,15 @@ public final class HTTPStubProtocol: URLProtocol {
     }
 
     public override class func canInit(with request: URLRequest) -> Bool {
-        return stubs.keys.contains(request)
+        stubs.keys.contains(request)
     }
 
     public override class func canonicalRequest(for request: URLRequest) -> URLRequest {
-        return request
+        request
     }
 
     public override class func requestIsCacheEquivalent(_: URLRequest, to _: URLRequest) -> Bool {
-        return false
+        false
     }
 
     public override func startLoading() {
