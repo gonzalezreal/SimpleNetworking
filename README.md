@@ -58,7 +58,7 @@ extension Endpoint where Output == Configuration {
 This way, you could obtain responses from that endpoint as follows:
 
 ```Swift
-cancellable = theMovieDbClient.response(for: .configuration).sink(receiveValue: { config in
+let subscription = theMovieDbClient.response(for: .configuration).sink(receiveValue: { config in
     print("base url for images: \(config.images.secureBaseURL)")
 })
 ```
@@ -189,16 +189,16 @@ class MovieItemCell: UICollectionViewCell {
     // ...
     private lazy var imageView = ImageView()
     private let imageDownloader = ImageDownloader()
-    private var cancellable: AnyCancellable?
+    private var subscription: AnyCancellable?
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        cancellable?.cancel()
+        subscription?.cancel()
     }
     
     func configure(with movieItem: MovieItem) {
         // ...
-        cancellable = imageDownloader.image(withURL: movieItem.posterURL)
+        subscription = imageDownloader.image(withURL: movieItem.posterURL)
             .map { $0.applyFancyEffect() }
             .replaceError(with: placeholderImage)
             .receive(on: DispatchQueue.main)
