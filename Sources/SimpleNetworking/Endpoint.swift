@@ -20,11 +20,12 @@ public struct Endpoint<Output> {
 public extension Endpoint where Output: Decodable {
     init(method: Method,
          path: String,
+         headers: [HeaderField: String] = [:],
          queryParameters: [String: String] = [:],
          dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .deferredToDate) {
         self.init(method: method,
                   path: path,
-                  headers: [.accept: ContentType.json.rawValue],
+                  headers: [.accept: ContentType.json.rawValue].merging(headers) { _, new in new },
                   queryParameters: queryParameters,
                   body: nil,
                   output: decode(with: dateDecodingStrategy))
@@ -32,12 +33,13 @@ public extension Endpoint where Output: Decodable {
 
     init<Input>(method: Method,
                 path: String,
+                headers: [HeaderField: String] = [:],
                 body: Input,
                 dateEncodingStrategy: JSONEncoder.DateEncodingStrategy = .deferredToDate,
                 dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .deferredToDate) where Input: Encodable {
         self.init(method: method,
                   path: path,
-                  headers: [.accept: ContentType.json.rawValue, .contentType: ContentType.json.rawValue],
+                  headers: [.accept: ContentType.json.rawValue, .contentType: ContentType.json.rawValue].merging(headers) { _, new in new },
                   queryParameters: [:],
                   body: try! encode(body, with: dateEncodingStrategy),
                   output: decode(with: dateDecodingStrategy))
@@ -47,11 +49,12 @@ public extension Endpoint where Output: Decodable {
 public extension Endpoint where Output == Void {
     init<Input>(method: Method,
                 path: String,
+                headers: [HeaderField: String] = [:],
                 body: Input,
                 dateEncodingStrategy: JSONEncoder.DateEncodingStrategy = .deferredToDate) where Input: Encodable {
         self.init(method: method,
                   path: path,
-                  headers: [.contentType: ContentType.json.rawValue],
+                  headers: [.contentType: ContentType.json.rawValue].merging(headers) { _, new in new },
                   queryParameters: [:],
                   body: try! encode(body, with: dateEncodingStrategy),
                   output: { _ in () })
