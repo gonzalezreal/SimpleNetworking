@@ -58,6 +58,21 @@ public extension Endpoint where Output == Void {
     }
 }
 
+public extension Endpoint where Output == Void {
+    init(method: Method,
+                path: String,
+                body: Data,
+                dateEncodingStrategy: JSONEncoder.DateEncodingStrategy = .deferredToDate) {
+        self.init(method: method,
+                  path: path,
+                  headers: [.contentType: ContentType.json.rawValue],
+                  queryParameters: [:],
+                  body: body,
+                  output: { _ in () })
+    }
+}
+
+
 private func decode<Output: Decodable>(with dateDecodingStrategy: JSONDecoder.DateDecodingStrategy) -> (Data) throws -> Output {
     { data in
         let decoder = JSONDecoder()
