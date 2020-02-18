@@ -9,10 +9,11 @@ public class APIClient {
 
     private let session: URLSession
 
-    public init(baseURL: URL, configuration: APIClientConfiguration = APIClientConfiguration(), session: URLSession = URLSession(configuration: .default)) {
+    public init(baseURL: URL, configuration: APIClientConfiguration = APIClientConfiguration(), session: URLSession = URLSession(configuration: .default), logLevel: Logger.Level = .info) {
         self.baseURL = baseURL
         self.configuration = configuration
         self.session = session
+        logger.logLevel = logLevel
     }
 
     public func response<Output>(for endpoint: Endpoint<Output>) -> AnyPublisher<Output, Error> {

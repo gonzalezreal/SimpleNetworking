@@ -1,6 +1,6 @@
 import Foundation
 
-internal extension Data {
+public extension Data {
     var logDescription: String {
         String(data: prettyPrintedJSON ?? self, encoding: .utf8).map {
             $0.components(separatedBy: .newlines)

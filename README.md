@@ -141,8 +141,7 @@ func popularItems() -> AnyPublisher<[MovieItem], Error> {
 The `APIClient` class uses [SwiftLog](https://github.com/apple/swift-log) to log requests and responses. If you set its `logger.logLevel` to `.debug` you will start seeing requests and responses as they happen in your logs.
 
 ```Swift
-let apiClient = APIClient(baseURL: URL(string: "https://api.themoviedb.org/3")!)
-apiClient.logger.logLevel = .debug
+let apiClient = APIClient(baseURL: URL(string: "https://api.themoviedb.org/3")!, logLevel: .debug)
 ```
 
 Here is an example of the output using the default `StreamLogHandler`:

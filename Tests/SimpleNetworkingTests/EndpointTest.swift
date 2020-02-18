@@ -4,8 +4,9 @@ import XCTest
 final class EndpointTest: XCTestCase {
     func testEndpointWithoutQuery() {
         // given
-        let endpoint = Endpoint<User>(method: .get, path: "test")
+        let endpoint = Endpoint<User>(method: .get, path: "test", headers: [.authorization: "Bearer 3xpo"])
         var expected = URLRequest(url: Fixtures.anyURLWithPath("test"))
+        expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
         expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Accept")
 
         // when
@@ -17,8 +18,9 @@ final class EndpointTest: XCTestCase {
 
     func testEndpointWithQuery() {
         // given
-        let endpoint = Endpoint<User>(method: .get, path: "test", queryParameters: ["foo": "bar"])
+        let endpoint = Endpoint<User>(method: .get, path: "test", headers: [.authorization: "Bearer 3xpo"], queryParameters: ["foo": "bar"])
         var expected = URLRequest(url: Fixtures.anyURLWithPath("test", query: "foo=bar"))
+        expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
         expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Accept")
 
         // when
@@ -31,11 +33,15 @@ final class EndpointTest: XCTestCase {
     func testEndpointWithBodyAndOutput() {
         // given
         let user = User(name: "test")
-        let endpoint = Endpoint<User>(method: .post, path: "user/new", body: user)
+        let endpoint = Endpoint<User>(method: .post,
+                                      path: "user/new",
+                                      headers: [.authorization: "Bearer 3xpo"],
+                                      body: user)
 
         var expected = URLRequest(url: Fixtures.anyURLWithPath("user/new"))
         expected.httpMethod = "POST"
         expected.httpBody = try! JSONEncoder().encode(user)
+        expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
         expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Accept")
         expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Content-Type")
 
@@ -49,11 +55,12 @@ final class EndpointTest: XCTestCase {
     func testEndpointWithBody() {
         // given
         let user = User(name: "test")
-        let endpoint = Endpoint<Void>(method: .post, path: "user/new", body: user)
+        let endpoint = Endpoint<Void>(method: .post, path: "user/new", headers: [.authorization: "Bearer 3xpo"], body: user)
 
         var expected = URLRequest(url: Fixtures.anyURLWithPath("user/new"))
         expected.httpMethod = "POST"
         expected.httpBody = try! JSONEncoder().encode(user)
+        expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
         expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Content-Type")
 
         // when
