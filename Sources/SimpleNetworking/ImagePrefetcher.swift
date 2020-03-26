@@ -4,7 +4,7 @@
     import UIKit
 
     public final class ImagePrefetcher {
-        public let session: URLSession
+        private let session: URLSession
         private var subscriptions: [URL: AnyCancellable] = [:]
 
         public init(session: URLSession = .sharedImage) {

@@ -23,7 +23,7 @@ final class APIClientTest: XCTestCase {
         // given
         givenAnyJSONResponse()
         let endpoint = Endpoint<User>(method: .get, path: "user")
-        let didReceiveValue = expectation(description: "receiveValue")
+        let didReceiveValue = expectation(description: "didReceiveValue")
         var result: User?
 
         // when
@@ -37,14 +37,14 @@ final class APIClientTest: XCTestCase {
 
         // then
         wait(for: [didReceiveValue], timeout: 1)
-        XCTAssertEqual(result, Fixtures.anyUser)
+        XCTAssertEqual(Fixtures.anyUser, result)
     }
 
     func testBadStatusResponseFailsWithBadStatusError() {
         // given
         givenBadStatusResponse()
         let endpoint = Endpoint<User>(method: .get, path: "user")
-        let didFail = expectation(description: "failed")
+        let didFail = expectation(description: "didFail")
         var result: Error?
 
         // when
@@ -61,7 +61,7 @@ final class APIClientTest: XCTestCase {
         wait(for: [didFail], timeout: 1)
 
         let badStatusError = result as? BadStatusError
-        XCTAssertEqual(badStatusError?.statusCode, 500)
+        XCTAssertEqual(500, badStatusError?.statusCode)
     }
 
     static var allTests = [

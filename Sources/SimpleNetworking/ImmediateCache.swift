@@ -2,7 +2,7 @@
     import Foundation
     import UIKit
 
-    public final class ImmediateCache {
+    internal final class ImmediateCache: ImageCache {
         public static let shared = ImmediateCache()
         private let cache = NSCache<NSURL, UIImage>()
 
