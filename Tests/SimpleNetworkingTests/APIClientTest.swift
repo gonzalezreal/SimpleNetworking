@@ -1,5 +1,5 @@
 import Combine
-@testable import SimpleNetworking
+import SimpleNetworking
 import XCTest
 
 final class APIClientTest: XCTestCase {

@@ -1,4 +1,4 @@
-@testable import SimpleNetworking
+import SimpleNetworking
 import XCTest
 
 final class EndpointTest: XCTestCase {
