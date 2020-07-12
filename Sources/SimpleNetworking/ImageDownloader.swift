@@ -3,6 +3,7 @@
     import Foundation
     import UIKit
 
+    @available(*, deprecated, message: "This functionality has been moved to https://github.com/gonzalezreal/NetworkImage")
     public final class ImageDownloader {
         private let session: URLSession
         private let imageCache: ImageCache

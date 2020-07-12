@@ -6,7 +6,7 @@
 
 **SimpleNetworking** is a Swift Package that helps you create scalable API clients. It uses [Combine](https://developer.apple.com/documentation/combine) to expose API responses, making it easy to compose and transform them.
 
-It also includes other goodies, like image downloading and caching, and network request stubbing.
+It also includes other goodies, like logging and network request stubbing.
 
 Let's explore all the features using [The Movie Database API](https://developers.themoviedb.org/3) as an example.
 
@@ -14,7 +14,6 @@ Let's explore all the features using [The Movie Database API](https://developers
 - [Configuring API clients](#configuring-api-clients)
 - [Combining and transforming responses](#combining-and-transforming-responses)
 - [Logging](#logging)
-- [Downloading images](#downloading-images)
 - [Stubbing network requests](#stubbing-network-requests)
 - [Installation](#installation)
 - [Help & Feedback](#help--feedback)
@@ -180,46 +179,6 @@ Here is an example of the output using the default `StreamLogHandler`:
 
 If you want to use [Apple's Unified Logging](https://developer.apple.com/documentation/os/logging) for your logs, you might want to try [UnifiedLogHandler](https://github.com/gonzalezreal/UnifiedLogging).
 
-## Downloading images
-You can use `ImageDownloader` to download images in your views and take advantage of Combine operators to apply transformations to them. `ImageDownloader` leverages the foundation [`URLCache`](https://developer.apple.com/documentation/foundation/urlcache), providing persistent and in-memory caches.
-
-```Swift
-class MovieItemCell: UICollectionViewCell {
-    // ...
-    private lazy var imageView = ImageView()
-    private let imageDownloader = ImageDownloader()
-    private var subscription: AnyCancellable?
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        subscription?.cancel()
-    }
-    
-    func configure(with movieItem: MovieItem) {
-        // ...
-        subscription = imageDownloader.image(withURL: movieItem.posterURL)
-            .map { $0.applyFancyEffect() }
-            .replaceError(with: placeholderImage)
-            .receive(on: DispatchQueue.main)
-            .assign(to: \.image, on: imageView)
-    }
-}
-```
-
-You can also preload images and warm the caches up by using an instance of `ImagePrefetcher`.
-
-```Swift
-extension MovieListViewController: UICollectionViewDataSourcePrefetching {
-    func collectionView(_: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-        imagePrefetcher.prefetchImages(with: imageURLs(at: indexPaths))
-    }
-
-    func collectionView(_: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
-        imagePrefetcher.cancelPrefetchingImages(with: imageURLs(at: indexPaths))
-    }
-}
-```
-
 ## Stubbing network requests
 Stubbing network requests can be useful when you are writing UI or integration tests and don't want to depend on the network being reachable.
 
@@ -253,6 +212,10 @@ Add SimpleNetworking as a dependency to your `Package.swift` file. For more info
 ```
 .package(url: "https://github.com/gonzalezreal/SimpleNetworking", from: "1.0.0")
 ```
+
+## Related projects
+- [NetworkImage](https://github.com/gonzalezreal/NetworkImage)
+- [UnifiedLogHandler](https://github.com/gonzalezreal/UnifiedLogging)
 
 ## Help & Feedback
 - [Open an issue](https://github.com/gonzalezreal/SimpleNetworking/issues/new) if you need help, if you found a bug, or if you want to discuss a feature request.
