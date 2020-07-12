@@ -29,8 +29,10 @@
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     final class APIClientTest: XCTestCase {
         private var sut: APIClient!
-        private let configuration = APIClientConfiguration(additionalHeaders: [.authorization: "Bearer 3xpo"],
-                                                           additionalQueryParameters: ["api_key": "test"])
+        private let configuration = APIClientConfiguration(
+            additionalHeaders: [.authorization: "Bearer 3xpo"],
+            additionalQueryParameters: ["api_key": "test"]
+        )
         private var cancellables = Set<AnyCancellable>()
 
         override func setUp() {
