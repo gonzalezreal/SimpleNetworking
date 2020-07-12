@@ -67,18 +67,22 @@ You can customize many properties of an `Endpoint`: headers, query parameters, b
 ```Swift
 extension Endpoint where Output == Page<MovieResult> {
     static func popularMovies(page: Int) -> Endpoint {
-        return Endpoint(method: .get,
-                        path: "movie/popular",
-                        queryParameters: ["page": String(page)],
-                        dateDecodingStrategy: .formatted(.theMovieDb))
+        return Endpoint(
+            method: .get,
+            path: "movie/popular",
+            queryParameters: ["page": String(page)],
+            dateDecodingStrategy: .formatted(.theMovieDb)
+        )
     }
 }
 
 extension Endpoint where Output == Session {
     static func session(with token: Token) -> Endpoint {
-        return Endpoint(method: .post,
-                        path: "authentication/session/new",
-                        body: token)
+        return Endpoint(
+            method: .post,
+            path: "authentication/session/new",
+            body: token
+        )
     }
 }
 ```
@@ -125,14 +129,18 @@ To build the list, we can use the `zip` operator with the publishers returned by
 
 ```Swift
 func popularItems() -> AnyPublisher<[MovieItem], Error> {
-    return Publishers.Zip3(theMovieDbClient.response(for: .popularMovies(page: 1)),
-                           theMovieDbClient.response(for: .configuration),
-                           theMovieDbClient.response(for: .movieGenres))
-        .map { (page, config, genres) -> [MovieItem] in
-            let url = config.images.secureBaseURL
-            return page.results.map { MovieItem(movieResult: $0, imageBaseURL: url, movieGenres: genres) }
+    return Publishers.Zip3(
+        theMovieDbClient.response(for: .popularMovies(page: 1)),
+        theMovieDbClient.response(for: .configuration),
+        theMovieDbClient.response(for: .movieGenres)
+    )
+    .map { (page, config, genres) -> [MovieItem] in
+        let url = config.images.secureBaseURL
+        return page.results.map {
+            MovieItem(movieResult: $0, imageBaseURL: url, movieGenres: genres)
         }
-        .eraseToAnyPublisher()
+    }
+    .eraseToAnyPublisher()
 }
 ```
 
@@ -210,7 +218,7 @@ You can check out [`APIClientTest`](Tests/SimpleNetworkingTests/APIClientTest.sw
 Add SimpleNetworking as a dependency to your `Package.swift` file. For more information, see the [Swift Package Manager documentation](https://github.com/apple/swift-package-manager/tree/master/Documentation).
 
 ```
-.package(url: "https://github.com/gonzalezreal/SimpleNetworking", from: "1.0.0")
+.package(url: "https://github.com/gonzalezreal/SimpleNetworking", from: "1.3.0")
 ```
 
 ## Related projects
