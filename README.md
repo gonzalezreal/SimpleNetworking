@@ -1,5 +1,5 @@
 # SimpleNetworking
-![Swift 5.1](https://img.shields.io/badge/Swift-5.2-orange.svg)
+![Swift 5.2](https://img.shields.io/badge/Swift-5.2-orange.svg)
 ![Platforms](https://img.shields.io/badge/platforms-macOS+iOS+tvOS+watchOS-brightgreen.svg?style=flat)
 [![Swift Package Manager](https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat)](https://swift.org/package-manager)
 [![Twitter: @gonzalezreal](https://img.shields.io/badge/twitter-@gonzalezreal-blue.svg?style=flat)](https://twitter.com/gonzalezreal)
