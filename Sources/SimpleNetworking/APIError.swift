@@ -1,5 +1,5 @@
 //
-// Fixtures.swift
+// APIError.swift
 //
 // Copyright (c) 2020 Guille Gonzalez
 //
@@ -23,28 +23,14 @@
 
 import Foundation
 
-struct User: Equatable, Codable {
-    let name: String
-}
+public struct APIError<Error>: Swift.Error {
+    public let statusCode: Int
+    public let error: Error
 
-struct Error: Equatable, Codable {
-    let message: String
-}
-
-enum Fixtures {
-    static let anyBaseURL = URL(string: "https://example.com")!
-    static let anyUser = User(name: "gonzalezreal")
-    static let anyValidResponse = try! JSONEncoder().encode(anyUser)
-    static let anyError = Error(message: "The resource you requested could not be found.")
-    static let anyErrorResponse = try! JSONEncoder().encode(anyError)
-    static let anyInvalidResponse = "invalid".data(using: .utf8)!
-
-    static func anyURLWithPath(_ path: String, query: String? = nil) -> URL {
-        let url = anyBaseURL.appendingPathComponent(path)
-
-        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
-        components.query = query
-
-        return components.url!
+    public init(statusCode: Int, error: Error) {
+        self.statusCode = statusCode
+        self.error = error
     }
 }
+
+extension APIError: Equatable where Error: Equatable {}

@@ -23,7 +23,7 @@
 
 import Foundation
 
-public struct Endpoint<Output> {
+public struct Endpoint<Output, Error> {
     public enum Method: String {
         case get = "GET"
         case post = "POST"
@@ -38,15 +38,34 @@ public struct Endpoint<Output> {
     public let queryParameters: [String: String]
     public let body: Data?
     public let output: (Data) throws -> Output
+    public let error: (Data) throws -> Error
+
+    public init(
+        method: Method,
+        path: String,
+        headers: [HeaderField: String],
+        queryParameters: [String: String],
+        body: Data?,
+        output: @escaping (Data) throws -> Output,
+        error: @escaping (Data) throws -> Error
+    ) {
+        self.method = method
+        self.path = path
+        self.headers = headers
+        self.queryParameters = queryParameters
+        self.body = body
+        self.output = output
+        self.error = error
+    }
 }
 
-public extension Endpoint where Output: Decodable {
+public extension Endpoint where Output: Decodable, Error: Decodable {
     init(
         method: Method,
         path: String,
         headers: [HeaderField: String] = [:],
         queryParameters: [String: String] = [:],
-        dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .deferredToDate
+        jsonDecoder: JSONDecoder = JSONDecoder()
     ) {
         self.init(
             method: method,
@@ -56,7 +75,8 @@ public extension Endpoint where Output: Decodable {
             ].merging(headers) { _, new in new },
             queryParameters: queryParameters,
             body: nil,
-            output: decode(with: dateDecodingStrategy)
+            output: { try jsonDecoder.decode(Output.self, from: $0) },
+            error: { try jsonDecoder.decode(Error.self, from: $0) }
         )
     }
 
@@ -65,9 +85,9 @@ public extension Endpoint where Output: Decodable {
         path: String,
         headers: [HeaderField: String] = [:],
         body: Input,
-        dateEncodingStrategy: JSONEncoder.DateEncodingStrategy = .deferredToDate,
-        dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .deferredToDate
-    ) where Input: Encodable {
+        jsonDecoder: JSONDecoder = JSONDecoder(),
+        jsonEncoder: JSONEncoder = JSONEncoder()
+    ) throws where Input: Encodable {
         self.init(
             method: method,
             path: path,
@@ -76,46 +96,98 @@ public extension Endpoint where Output: Decodable {
                 .contentType: ContentType.json.rawValue,
             ].merging(headers) { _, new in new },
             queryParameters: [:],
-            body: try! encode(body, with: dateEncodingStrategy),
-            output: decode(with: dateDecodingStrategy)
+            body: try jsonEncoder.encode(body),
+            output: { try jsonDecoder.decode(Output.self, from: $0) },
+            error: { try jsonDecoder.decode(Error.self, from: $0) }
         )
     }
 }
 
-public extension Endpoint where Output == Void {
+public extension Endpoint where Output == Void, Error: Decodable {
     init<Input>(
         method: Method,
         path: String,
         headers: [HeaderField: String] = [:],
         body: Input,
-        dateEncodingStrategy: JSONEncoder.DateEncodingStrategy = .deferredToDate
-    ) where Input: Encodable {
+        jsonDecoder: JSONDecoder = JSONDecoder(),
+        jsonEncoder: JSONEncoder = JSONEncoder()
+    ) throws where Input: Encodable {
         self.init(
             method: method,
             path: path,
-            headers: [.contentType: ContentType.json.rawValue].merging(headers) { _, new in new },
+            headers: [
+                .contentType: ContentType.json.rawValue,
+            ].merging(headers) { _, new in new },
             queryParameters: [:],
-            body: try! encode(body, with: dateEncodingStrategy),
-            output: { _ in () }
+            body: try jsonEncoder.encode(body),
+            output: { _ in () },
+            error: { try jsonDecoder.decode(Error.self, from: $0) }
         )
     }
 }
 
-private func decode<Output: Decodable>(
-    with dateDecodingStrategy: JSONDecoder.DateDecodingStrategy
-) -> (Data) throws -> Output {
-    { data in
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = dateDecodingStrategy
-        return try decoder.decode(Output.self, from: data)
+public extension Endpoint where Output: Decodable, Error == Void {
+    init(
+        method: Method,
+        path: String,
+        headers: [HeaderField: String] = [:],
+        queryParameters: [String: String] = [:],
+        jsonDecoder: JSONDecoder = JSONDecoder()
+    ) {
+        self.init(
+            method: method,
+            path: path,
+            headers: [
+                .accept: ContentType.json.rawValue,
+            ].merging(headers) { _, new in new },
+            queryParameters: queryParameters,
+            body: nil,
+            output: { try jsonDecoder.decode(Output.self, from: $0) },
+            error: { _ in () }
+        )
+    }
+
+    init<Input>(
+        method: Method,
+        path: String,
+        headers: [HeaderField: String] = [:],
+        body: Input,
+        jsonDecoder: JSONDecoder = JSONDecoder(),
+        jsonEncoder: JSONEncoder = JSONEncoder()
+    ) throws where Input: Encodable {
+        self.init(
+            method: method,
+            path: path,
+            headers: [
+                .accept: ContentType.json.rawValue,
+                .contentType: ContentType.json.rawValue,
+            ].merging(headers) { _, new in new },
+            queryParameters: [:],
+            body: try jsonEncoder.encode(body),
+            output: { try jsonDecoder.decode(Output.self, from: $0) },
+            error: { _ in () }
+        )
     }
 }
 
-private func encode<Input: Encodable>(
-    _ body: Input, with dateEncodingStrategy: JSONEncoder.DateEncodingStrategy
-) throws -> Data {
-    let encoder = JSONEncoder()
-    encoder.dateEncodingStrategy = dateEncodingStrategy
-
-    return try encoder.encode(body)
+public extension Endpoint where Output == Void, Error == Void {
+    init<Input>(
+        method: Method,
+        path: String,
+        headers: [HeaderField: String] = [:],
+        body: Input,
+        jsonEncoder: JSONEncoder = JSONEncoder()
+    ) throws where Input: Encodable {
+        self.init(
+            method: method,
+            path: path,
+            headers: [
+                .contentType: ContentType.json.rawValue,
+            ].merging(headers) { _, new in new },
+            queryParameters: [:],
+            body: try jsonEncoder.encode(body),
+            output: { _ in () },
+            error: { _ in () }
+        )
+    }
 }

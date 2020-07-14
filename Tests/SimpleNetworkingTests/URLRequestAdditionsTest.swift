@@ -108,12 +108,4 @@ final class URLRequestAdditionsTest: XCTestCase {
         // then
         XCTAssertEqual(result, expected)
     }
-
-    static var allTests = [
-        ("testAnyRequestAddingQueryReturnsExpectedRequest", testAnyRequestAddingQueryReturnsExpectedRequest),
-        ("testAnyRequestAddingHeadersReturnsExpectedRequest", testAnyRequestAddingHeadersReturnsExpectedRequest),
-        ("testAnyRequestLogDescription", testAnyRequestLogDescription),
-        ("testAnyRequestWithHeadersLogDescription", testAnyRequestWithHeadersLogDescription),
-        ("testAnyRequestWithBodyLogDescription", testAnyRequestWithBodyLogDescription),
-    ]
 }

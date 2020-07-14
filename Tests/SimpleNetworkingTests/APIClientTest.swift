@@ -46,10 +46,10 @@
             super.tearDown()
         }
 
-        func testAnyJSONResponseReturnsOutput() {
+        func testAnyValidResponseReturnsOutput() {
             // given
-            givenAnyJSONResponse()
-            let endpoint = Endpoint<User>(method: .get, path: "user")
+            givenAnyValidResponse()
+            let endpoint = Endpoint<User, Void>(method: .get, path: "user")
             let didReceiveValue = expectation(description: "didReceiveValue")
             var result: User?
 
@@ -62,57 +62,90 @@
                 })
                 .store(in: &cancellables)
 
-            // then
             wait(for: [didReceiveValue], timeout: 1)
+
+            // then
             XCTAssertEqual(Fixtures.anyUser, result)
         }
 
-        func testBadStatusResponseFailsWithBadStatusError() {
+        func testAnyInvalidResponseReturnsDecodingError() {
             // given
-            givenBadStatusResponse()
-            let endpoint = Endpoint<User>(method: .get, path: "user")
+            givenAnyInvalidResponse()
+            let endpoint = Endpoint<User, Void>(method: .get, path: "user")
             let didFail = expectation(description: "didFail")
-            var result: Error?
+            var result: DecodingError?
 
             // when
             sut.response(for: endpoint)
-                .catch { error -> Just<User> in
-                    result = error
-                    didFail.fulfill()
-                    return Just(User(name: ""))
-                }
-                .sink(receiveValue: { _ in })
+                .sink(
+                    receiveCompletion: { completion in
+                        if case let .failure(error) = completion {
+                            result = error.decodingError
+                            didFail.fulfill()
+                        }
+                    },
+                    receiveValue: { _ in }
+                )
                 .store(in: &cancellables)
 
-            // then
             wait(for: [didFail], timeout: 1)
 
-            let badStatusError = result as? BadStatusError
-            XCTAssertEqual(500, badStatusError?.statusCode)
+            // then
+            XCTAssertNotNil(result)
         }
 
-        static var allTests = [
-            ("testAnyJSONResponseReturnsOutput", testAnyJSONResponseReturnsOutput),
-            ("testBadStatusResponseFailsWithBadStatusError", testBadStatusResponseFailsWithBadStatusError),
-        ]
+        func testAnyErrorResponseReturnsAPIError() {
+            // given
+            givenAnyErrorResponse()
+            let endpoint = Endpoint<User, Error>(method: .get, path: "user")
+            let didFail = expectation(description: "didFail")
+            var result: APIError<Error>?
+
+            // when
+            sut.response(for: endpoint)
+                .sink(
+                    receiveCompletion: { completion in
+                        if case let .failure(error) = completion {
+                            result = error.apiError
+                            didFail.fulfill()
+                        }
+                    },
+                    receiveValue: { _ in }
+                )
+                .store(in: &cancellables)
+
+            wait(for: [didFail], timeout: 1)
+
+            // then
+            XCTAssertEqual(404, result?.statusCode)
+            XCTAssertEqual(Fixtures.anyError, result?.error)
+        }
     }
 
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     private extension APIClientTest {
-        func givenAnyJSONResponse() {
+        func givenAnyValidResponse() {
             var request = URLRequest(url: Fixtures.anyURLWithPath("user", query: "api_key=test"))
             request.addValue(ContentType.json.rawValue, forHTTPHeaderField: HeaderField.accept.rawValue)
             request.addValue("Bearer 3xpo", forHTTPHeaderField: HeaderField.authorization.rawValue)
 
-            HTTPStubProtocol.stubRequest(request, data: Fixtures.anyJSON, statusCode: 200)
+            HTTPStubProtocol.stubRequest(request, data: Fixtures.anyValidResponse, statusCode: 200)
         }
 
-        func givenBadStatusResponse() {
+        func givenAnyErrorResponse() {
             var request = URLRequest(url: Fixtures.anyURLWithPath("user", query: "api_key=test"))
             request.addValue(ContentType.json.rawValue, forHTTPHeaderField: HeaderField.accept.rawValue)
             request.addValue("Bearer 3xpo", forHTTPHeaderField: HeaderField.authorization.rawValue)
 
-            HTTPStubProtocol.stubRequest(request, data: Data(), statusCode: 500)
+            HTTPStubProtocol.stubRequest(request, data: Fixtures.anyErrorResponse, statusCode: 404)
+        }
+
+        func givenAnyInvalidResponse() {
+            var request = URLRequest(url: Fixtures.anyURLWithPath("user", query: "api_key=test"))
+            request.addValue(ContentType.json.rawValue, forHTTPHeaderField: HeaderField.accept.rawValue)
+            request.addValue("Bearer 3xpo", forHTTPHeaderField: HeaderField.authorization.rawValue)
+
+            HTTPStubProtocol.stubRequest(request, data: Fixtures.anyInvalidResponse, statusCode: 200)
         }
     }
 #endif

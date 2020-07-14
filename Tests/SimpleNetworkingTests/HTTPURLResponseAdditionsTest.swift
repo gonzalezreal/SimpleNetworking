@@ -45,13 +45,9 @@ final class HTTPURLResponseAdditionsTest: XCTestCase {
         """
 
         // when
-        let result = anyResponse.logDescription(content: Fixtures.anyJSON.logDescription)
+        let result = anyResponse.logDescription(content: Fixtures.anyValidResponse.logDescription)
 
         // then
         XCTAssertEqual(result, expected)
     }
-
-    static var allTests = [
-        ("testResponseLogDescription", testAnyResponseLogDescription),
-    ]
 }

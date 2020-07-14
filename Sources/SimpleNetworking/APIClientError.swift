@@ -1,5 +1,5 @@
 //
-// BadStatusError.swift
+// APIClientError.swift
 //
 // Copyright (c) 2020 Guille Gonzalez
 //
@@ -23,8 +23,36 @@
 
 import Foundation
 
-public struct BadStatusError: Error {
-    public let data: Data
-    public let response: HTTPURLResponse
-    public var statusCode: Int { response.statusCode }
+public enum APIClientError<Error>: Swift.Error {
+    case loadingError(Swift.Error)
+    case decodingError(DecodingError)
+    case apiError(APIError<Error>)
+
+    internal init(_ error: Swift.Error) {
+        switch error {
+        case let apiError as APIError<Error>:
+            self = .apiError(apiError)
+        case let decodingError as DecodingError:
+            self = .decodingError(decodingError)
+        default:
+            self = .loadingError(error)
+        }
+    }
+}
+
+public extension APIClientError {
+    var loadingError: Swift.Error? {
+        guard case let .loadingError(value) = self else { return nil }
+        return value
+    }
+
+    var decodingError: DecodingError? {
+        guard case let .decodingError(value) = self else { return nil }
+        return value
+    }
+
+    var apiError: APIError<Error>? {
+        guard case let .apiError(value) = self else { return nil }
+        return value
+    }
 }
