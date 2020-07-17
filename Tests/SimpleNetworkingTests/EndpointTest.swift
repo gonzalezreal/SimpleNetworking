@@ -27,7 +27,11 @@ import XCTest
 final class EndpointTest: XCTestCase {
     func testEndpointWithoutQuery() {
         // given
-        let endpoint = Endpoint<User>(method: .get, path: "test", headers: [.authorization: "Bearer 3xpo"])
+        let endpoint = Endpoint<User, Error>(
+            method: .get,
+            path: "test",
+            headers: [.authorization: "Bearer 3xpo"]
+        )
         var expected = URLRequest(url: Fixtures.anyURLWithPath("test"))
         expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
         expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Accept")
@@ -41,7 +45,7 @@ final class EndpointTest: XCTestCase {
 
     func testEndpointWithQuery() {
         // given
-        let endpoint = Endpoint<User>(
+        let endpoint = Endpoint<User, Error>(
             method: .get,
             path: "test",
             headers: [.authorization: "Bearer 3xpo"],
@@ -58,10 +62,10 @@ final class EndpointTest: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
-    func testEndpointWithBodyAndOutput() {
+    func testEndpointWithBodyAndOutput() throws {
         // given
         let user = User(name: "test")
-        let endpoint = Endpoint<User>(
+        let endpoint = try Endpoint<User, Error>(
             method: .post,
             path: "user/new",
             headers: [.authorization: "Bearer 3xpo"],
@@ -82,10 +86,10 @@ final class EndpointTest: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
-    func testEndpointWithBody() {
+    func testEndpointWithBody() throws {
         // given
         let user = User(name: "test")
-        let endpoint = Endpoint<Void>(
+        let endpoint = try Endpoint<Void, Error>(
             method: .post,
             path: "user/new",
             headers: [.authorization: "Bearer 3xpo"],
@@ -104,11 +108,4 @@ final class EndpointTest: XCTestCase {
         // then
         XCTAssertEqual(result, expected)
     }
-
-    static var allTests = [
-        ("testEndpointWithoutQuery", testEndpointWithoutQuery),
-        ("testEndpointWithQuery", testEndpointWithQuery),
-        ("testEndpointWithBodyAndOutput", testEndpointWithBodyAndOutput),
-        ("testEndpointWithBody", testEndpointWithBody),
-    ]
 }

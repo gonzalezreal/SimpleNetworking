@@ -39,7 +39,7 @@ extension URLRequest {
         return result
     }
 
-    public init<Output>(baseURL: URL, endpoint: Endpoint<Output>) {
+    public init<Output, Error>(baseURL: URL, endpoint: Endpoint<Output, Error>) {
         let url = baseURL.appendingPathComponent(endpoint.path)
 
         var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!

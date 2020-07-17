@@ -46,7 +46,7 @@
             logger.logLevel = logLevel
         }
 
-        public func response<Output>(for endpoint: Endpoint<Output>) -> AnyPublisher<Output, Error> {
+        public func response<Output, Error>(for endpoint: Endpoint<Output, Error>) -> AnyPublisher<Output, APIClientError<Error>> {
             let request = URLRequest(baseURL: baseURL, endpoint: endpoint)
                 .addingHeaders(configuration.additionalHeaders)
                 .addingQueryParameters(configuration.additionalQueryParameters)
@@ -60,11 +60,13 @@
                     logger.debug("\(httpResponse.logDescription(content: data.logDescription))")
 
                     guard 200 ..< 300 ~= httpResponse.statusCode else {
-                        throw BadStatusError(data: data, response: httpResponse)
+                        let error = try endpoint.error(data)
+                        throw APIError(statusCode: httpResponse.statusCode, error: error)
                     }
 
                     return try endpoint.output(data)
                 }
+                .mapError(APIClientError.init)
                 .eraseToAnyPublisher()
         }
     }
