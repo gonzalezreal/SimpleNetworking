@@ -23,6 +23,7 @@
 
 import Foundation
 
+/// An error that occurs during an `APIClient` request.
 public enum APIClientError<Error>: Swift.Error {
     case loadingError(Swift.Error)
     case decodingError(DecodingError)

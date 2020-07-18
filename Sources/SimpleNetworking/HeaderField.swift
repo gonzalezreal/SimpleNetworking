@@ -23,16 +23,40 @@
 
 import Foundation
 
+/// Represents an HTTP header field.
+///
+/// You can define your own header field by using a static property in an extension of this type:
+///
+///     extension HeaderField {
+///         static let correlator = HeaderField(rawValue: "X-Correlator")
+///     }
+///
+/// And then use it when creating an endpoint:
+///
+///     let generateToken = Endpoint<Conversation, ErrorResponse>(
+///         method: .post,
+///         path: "tokens/generate",
+///         headers: [
+///             .authorization: "Bearer \(secret)",
+///             .correlator: UUID().uuidString
+///         ]
+///     )
+///
 public struct HeaderField: Hashable, Equatable, RawRepresentable {
     public let rawValue: String
 
-    public init?(rawValue: String) {
+    public init(rawValue: String) {
         self.rawValue = rawValue
     }
 }
 
 public extension HeaderField {
-    static let accept = HeaderField(rawValue: "Accept")!
-    static let authorization = HeaderField(rawValue: "Authorization")!
-    static let contentType = HeaderField(rawValue: "Content-Type")!
+    /// `"Accept"` header field.
+    static let accept = HeaderField(rawValue: "Accept")
+
+    /// `"Authorization"` header field.
+    static let authorization = HeaderField(rawValue: "Authorization")
+
+    /// `"Content-Type"` header field.
+    static let contentType = HeaderField(rawValue: "Content-Type")
 }

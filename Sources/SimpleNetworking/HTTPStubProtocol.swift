@@ -23,6 +23,26 @@
 
 import Foundation
 
+/// A `URLProtocol` subclass that stubs HTTP requests.
+///
+/// You can use `HTTPStubProtocol` to stub a network request as follows:
+///
+///     var request = URLRequest(url: URL(string: "https://example.com/user?api_key=test")!)
+///     request.addValue("application/json", forHTTPHeaderField: "Accept")
+///     request.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
+///
+///     let json = #"{"foo": "bar"}"#.data(using: .utf8)!
+///
+///     HTTPStubProtocol.stubRequest(request, data: json, statusCode: 200)
+///
+/// And then pass the `.stubbed` URL session as a parameter when constructing your `APIClient`:
+///
+///     let apiClient = APIClient(
+///         baseURL: URL(string: "https://example.com")!,
+///         configuration: configuration,
+///         session: .stubbed
+///     )
+///
 public final class HTTPStubProtocol: URLProtocol {
     private struct Stub {
         let data: Data

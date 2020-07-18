@@ -39,6 +39,12 @@ extension URLRequest {
         return result
     }
 
+    /// Initializes a `URLRequest` using a base URL and an endpoint.
+    ///
+    /// - Parameters:
+    ///   - baseURL: The base URL to which the endpoint path is appended.
+    ///   - endpoint: The endpoint that specifies the query parameters, headers and body for the request.
+    ///
     public init<Output, Error>(baseURL: URL, endpoint: Endpoint<Output, Error>) {
         let url = baseURL.appendingPathComponent(endpoint.path)
 
@@ -58,6 +64,7 @@ extension URLRequest {
         }
     }
 
+    /// Returns a new URL request by adding the given query parameters to this request.
     public func addingQueryParameters(_ parameters: [String: String]) -> URLRequest {
         guard !parameters.isEmpty else { return self }
 
@@ -72,6 +79,7 @@ extension URLRequest {
         return result
     }
 
+    /// Returns a new URL request by adding the given headers to this request.
     public func addingHeaders(_ headers: [HeaderField: String]) -> URLRequest {
         guard !headers.isEmpty else { return self }
 
