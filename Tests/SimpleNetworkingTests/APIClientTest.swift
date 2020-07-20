@@ -49,12 +49,12 @@
         func testAnyValidResponseReturnsOutput() {
             // given
             givenAnyValidResponse()
-            let endpoint = Endpoint<User, Void>(method: .get, path: "user")
+            let request = APIRequest<User, Void>(method: .get, path: "user")
             let didReceiveValue = expectation(description: "didReceiveValue")
             var result: User?
 
             // when
-            sut.response(for: endpoint)
+            sut.response(for: request)
                 .assertNoFailure()
                 .sink(receiveValue: {
                     result = $0
@@ -71,12 +71,12 @@
         func testAnyInvalidResponseReturnsDecodingError() {
             // given
             givenAnyInvalidResponse()
-            let endpoint = Endpoint<User, Void>(method: .get, path: "user")
+            let request = APIRequest<User, Void>(method: .get, path: "user")
             let didFail = expectation(description: "didFail")
             var result: DecodingError?
 
             // when
-            sut.response(for: endpoint)
+            sut.response(for: request)
                 .sink(
                     receiveCompletion: { completion in
                         if case let .failure(error) = completion {
@@ -97,12 +97,12 @@
         func testAnyErrorResponseReturnsAPIError() {
             // given
             givenAnyErrorResponse()
-            let endpoint = Endpoint<User, Error>(method: .get, path: "user")
+            let request = APIRequest<User, Error>(method: .get, path: "user")
             let didFail = expectation(description: "didFail")
             var result: APIError<Error>?
 
             // when
-            sut.response(for: endpoint)
+            sut.response(for: request)
                 .sink(
                     receiveCompletion: { completion in
                         if case let .failure(error) = completion {

@@ -46,25 +46,25 @@
             logger.logLevel = logLevel
         }
 
-        public func response<Output, Error>(for endpoint: Endpoint<Output, Error>) -> AnyPublisher<Output, APIClientError<Error>> {
-            let request = URLRequest(baseURL: baseURL, endpoint: endpoint)
+        public func response<Output, Error>(for apiRequest: APIRequest<Output, Error>) -> AnyPublisher<Output, APIClientError<Error>> {
+            let urlRequest = URLRequest(baseURL: baseURL, apiRequest: apiRequest)
                 .addingHeaders(configuration.additionalHeaders)
                 .addingQueryParameters(configuration.additionalQueryParameters)
 
-            logger.debug("\(request.logDescription)")
+            logger.debug("\(urlRequest.logDescription)")
 
-            return session.dataTaskPublisher(for: request)
+            return session.dataTaskPublisher(for: urlRequest)
                 .tryMap { [logger] data, response in
                     let httpResponse = response as! HTTPURLResponse
 
                     logger.debug("\(httpResponse.logDescription(content: data.logDescription))")
 
                     guard 200 ..< 300 ~= httpResponse.statusCode else {
-                        let error = try endpoint.error(data)
+                        let error = try apiRequest.error(data)
                         throw APIError(statusCode: httpResponse.statusCode, error: error)
                     }
 
-                    return try endpoint.output(data)
+                    return try apiRequest.output(data)
                 }
                 .mapError(APIClientError.init)
                 .eraseToAnyPublisher()

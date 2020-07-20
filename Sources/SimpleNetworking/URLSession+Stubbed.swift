@@ -1,5 +1,5 @@
 //
-// URLSessionAdditions.swift
+// URLSession+Stubbed.swift
 //
 // Copyright (c) 2020 Guille Gonzalez
 //
