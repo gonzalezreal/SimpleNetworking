@@ -32,7 +32,7 @@ final class URLRequestAdditionsTest: XCTestCase {
         let expected = URLRequest(url: Fixtures.anyURLWithPath("test", query: "baz=qux&foo=bar"))
 
         // when
-        let result = anyRequest.addingQueryParameters(["baz": "qux"])
+        let result = anyRequest.addingParameters(["baz": "qux"])
 
         // then
         XCTAssertEqual(result, expected)

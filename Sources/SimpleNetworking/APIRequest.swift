@@ -79,7 +79,7 @@ public struct APIRequest<Output, Error> {
     /// The parameters that are passed with the request.
     ///
     /// This parameters are appended to the URL as query parameters.
-    public let queryParameters: [String: CustomStringConvertible]
+    public let parameters: [String: CustomStringConvertible]
 
     /// The body payload that is passed with the request.
     ///
@@ -98,7 +98,7 @@ public struct APIRequest<Output, Error> {
     ///   - method: The HTTP method for the request.
     ///   - path: The route to the request endpoint.
     ///   - headers: The headers that are passed with the request.
-    ///   - queryParameters: The parameters that are passed with the request. This parameters are appended to the URL as query parameters.
+    ///   - parameters: The parameters that are passed with the request. This parameters are appended to the URL as query parameters.
     ///   - body: The body payload that is passed with the request.
     ///   - output: A closure that decodes a valid response into a value of type `Output`.
     ///   - error: A closure that decodes an error response into a value of type `Error`.
@@ -106,7 +106,7 @@ public struct APIRequest<Output, Error> {
         method: Method,
         path: String,
         headers: [HeaderField: String],
-        queryParameters: [String: CustomStringConvertible],
+        parameters: [String: CustomStringConvertible],
         body: Data?,
         output: @escaping (Data) throws -> Output,
         error: @escaping (Data) throws -> Error
@@ -114,7 +114,7 @@ public struct APIRequest<Output, Error> {
         self.method = method
         self.path = path
         self.headers = headers
-        self.queryParameters = queryParameters
+        self.parameters = parameters
         self.body = body
         self.output = output
         self.error = error
@@ -128,7 +128,7 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
     ///   - method: The HTTP method for the request.
     ///   - path: The route to the request endpoint.
     ///   - headers: The headers that are passed with the request.
-    ///   - queryParameters: The parameters that are passed with the request. This parameters are appended to the URL as query parameters.
+    ///   - parameters: The parameters that are passed with the request. This parameters are appended to the URL as query parameters.
     ///   - jsonDecoder: The JSON decoder that will be used to decode valid and error responses.
     ///
     /// This initializer uses the provided or the default JSON decoder to decode valid and error responses
@@ -147,7 +147,7 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
         method: Method,
         path: String,
         headers: [HeaderField: String] = [:],
-        queryParameters: [String: CustomStringConvertible] = [:],
+        parameters: [String: CustomStringConvertible] = [:],
         jsonDecoder: JSONDecoder = JSONDecoder()
     ) {
         self.init(
@@ -156,7 +156,7 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
             headers: [
                 .accept: ContentType.json.rawValue,
             ].merging(headers) { _, new in new },
-            queryParameters: queryParameters,
+            parameters: parameters,
             body: nil,
             output: { try jsonDecoder.decode(Output.self, from: $0) },
             error: { try jsonDecoder.decode(Error.self, from: $0) }
@@ -201,7 +201,7 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
                 .accept: ContentType.json.rawValue,
                 .contentType: ContentType.json.rawValue,
             ].merging(headers) { _, new in new },
-            queryParameters: [:],
+            parameters: [:],
             body: try jsonEncoder.encode(body),
             output: { try jsonDecoder.decode(Output.self, from: $0) },
             error: { try jsonDecoder.decode(Error.self, from: $0) }
@@ -224,7 +224,7 @@ public extension APIRequest where Output == Void, Error: Decodable {
             headers: [
                 .contentType: ContentType.json.rawValue,
             ].merging(headers) { _, new in new },
-            queryParameters: [:],
+            parameters: [:],
             body: try jsonEncoder.encode(body),
             output: { _ in () },
             error: { try jsonDecoder.decode(Error.self, from: $0) }
@@ -237,7 +237,7 @@ public extension APIRequest where Output: Decodable, Error == Void {
         method: Method,
         path: String,
         headers: [HeaderField: String] = [:],
-        queryParameters: [String: CustomStringConvertible] = [:],
+        parameters: [String: CustomStringConvertible] = [:],
         jsonDecoder: JSONDecoder = JSONDecoder()
     ) {
         self.init(
@@ -246,7 +246,7 @@ public extension APIRequest where Output: Decodable, Error == Void {
             headers: [
                 .accept: ContentType.json.rawValue,
             ].merging(headers) { _, new in new },
-            queryParameters: queryParameters,
+            parameters: parameters,
             body: nil,
             output: { try jsonDecoder.decode(Output.self, from: $0) },
             error: { _ in () }
@@ -268,7 +268,7 @@ public extension APIRequest where Output: Decodable, Error == Void {
                 .accept: ContentType.json.rawValue,
                 .contentType: ContentType.json.rawValue,
             ].merging(headers) { _, new in new },
-            queryParameters: [:],
+            parameters: [:],
             body: try jsonEncoder.encode(body),
             output: { try jsonDecoder.decode(Output.self, from: $0) },
             error: { _ in () }
@@ -290,7 +290,7 @@ public extension APIRequest where Output == Void, Error == Void {
             headers: [
                 .contentType: ContentType.json.rawValue,
             ].merging(headers) { _, new in new },
-            queryParameters: [:],
+            parameters: [:],
             body: try jsonEncoder.encode(body),
             output: { _ in () },
             error: { _ in () }

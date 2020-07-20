@@ -49,7 +49,7 @@ final class APIRequestTest: XCTestCase {
             method: .get,
             path: "test",
             headers: [.authorization: "Bearer 3xpo"],
-            queryParameters: ["foo": "bar"]
+            parameters: ["foo": "bar"]
         )
         var expected = URLRequest(url: Fixtures.anyURLWithPath("test", query: "foo=bar"))
         expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")

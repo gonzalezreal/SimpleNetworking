@@ -31,7 +31,7 @@
         private var sut: APIClient!
         private let configuration = APIClientConfiguration(
             additionalHeaders: [.authorization: "Bearer 3xpo"],
-            additionalQueryParameters: ["api_key": "test"]
+            additionalParameters: ["api_key": "test"]
         )
         private var cancellables = Set<AnyCancellable>()
 
