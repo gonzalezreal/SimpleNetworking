@@ -49,7 +49,7 @@
         func testAnyValidResponseReturnsOutput() {
             // given
             givenAnyValidResponse()
-            let request = APIRequest<User, Void>(method: .get, path: "user")
+            let request = APIRequest<User, Error>.get("/user")
             let didReceiveValue = expectation(description: "didReceiveValue")
             var result: User?
 
@@ -71,7 +71,7 @@
         func testAnyInvalidResponseReturnsDecodingError() {
             // given
             givenAnyInvalidResponse()
-            let request = APIRequest<User, Void>(method: .get, path: "user")
+            let request = APIRequest<User, Error>.get("/user")
             let didFail = expectation(description: "didFail")
             var result: DecodingError?
 
@@ -97,7 +97,7 @@
         func testAnyErrorResponseReturnsAPIError() {
             // given
             givenAnyErrorResponse()
-            let request = APIRequest<User, Error>(method: .get, path: "user")
+            let request = APIRequest<User, Error>.get("/user")
             let didFail = expectation(description: "didFail")
             var result: APIError<Error>?
 

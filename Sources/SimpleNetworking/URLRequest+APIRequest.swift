@@ -75,7 +75,7 @@ extension URLRequest {
         let queryItems = (components.queryItems ?? []) + parameters.map { name, value in
             URLQueryItem(name: name, value: value.description)
         }
-        
+
         components.queryItems = queryItems.sorted { $0.name < $1.name }
 
         var result = self
