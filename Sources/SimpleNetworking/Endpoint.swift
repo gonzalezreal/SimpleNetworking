@@ -78,7 +78,7 @@ public struct Endpoint<Output, Error> {
     /// Optional parameters for the request.
     public let queryParameters: [String: String]
 
-    /// Payload for the request.
+    /// Optional payload for the request.
     ///
     /// The `body` property is normally used as a payload for `.post`, `.put` and `.patch` requests.
     public let body: Data?
