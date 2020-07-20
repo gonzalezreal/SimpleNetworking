@@ -79,7 +79,7 @@ public struct APIRequest<Output, Error> {
     /// The parameters that are passed with the request.
     ///
     /// This parameters are appended to the URL as query parameters.
-    public let queryParameters: [String: String]
+    public let queryParameters: [String: CustomStringConvertible]
 
     /// The body payload that is passed with the request.
     ///
@@ -106,7 +106,7 @@ public struct APIRequest<Output, Error> {
         method: Method,
         path: String,
         headers: [HeaderField: String],
-        queryParameters: [String: String],
+        queryParameters: [String: CustomStringConvertible],
         body: Data?,
         output: @escaping (Data) throws -> Output,
         error: @escaping (Data) throws -> Error
@@ -147,7 +147,7 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
         method: Method,
         path: String,
         headers: [HeaderField: String] = [:],
-        queryParameters: [String: String] = [:],
+        queryParameters: [String: CustomStringConvertible] = [:],
         jsonDecoder: JSONDecoder = JSONDecoder()
     ) {
         self.init(
@@ -237,7 +237,7 @@ public extension APIRequest where Output: Decodable, Error == Void {
         method: Method,
         path: String,
         headers: [HeaderField: String] = [:],
-        queryParameters: [String: String] = [:],
+        queryParameters: [String: CustomStringConvertible] = [:],
         jsonDecoder: JSONDecoder = JSONDecoder()
     ) {
         self.init(

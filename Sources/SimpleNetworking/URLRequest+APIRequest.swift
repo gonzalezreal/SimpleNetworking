@@ -51,7 +51,9 @@ extension URLRequest {
         var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
 
         if !apiRequest.queryParameters.isEmpty {
-            components.queryItems = apiRequest.queryParameters.sorted { $0.key < $1.key }.map(URLQueryItem.init)
+            components.queryItems = apiRequest.queryParameters.sorted { $0.key < $1.key }.map { name, value in
+                URLQueryItem(name: name, value: value.description)
+            }
         }
 
         self.init(url: components.url!)
