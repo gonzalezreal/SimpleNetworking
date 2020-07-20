@@ -23,8 +23,12 @@
 
 import Foundation
 
+/// The `APIError` type encapsulates an error returned by an API.
 public struct APIError<Error>: Swift.Error {
+    /// The HTTP status code.
     public let statusCode: Int
+
+    /// The error response.
     public let error: Error
 
     public init(statusCode: Int, error: Error) {

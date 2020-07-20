@@ -24,6 +24,7 @@
 import Foundation
 
 extension URLSession {
+    /// A URL session whose requests can be stubbed with `HTTPStubProtocol`.
     public static var stubbed: URLSession {
         let configuration = URLSessionConfiguration.default
         configuration.protocolClasses = [HTTPStubProtocol.self]
