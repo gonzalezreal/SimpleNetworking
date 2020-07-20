@@ -1,5 +1,5 @@
 //
-// URLRequestAdditions.swift
+// URLRequest+APIRequest.swift
 //
 // Copyright (c) 2020 Guille Gonzalez
 //
@@ -39,21 +39,21 @@ extension URLRequest {
         return result
     }
 
-    public init<Output, Error>(baseURL: URL, endpoint: Endpoint<Output, Error>) {
-        let url = baseURL.appendingPathComponent(endpoint.path)
+    public init<Output, Error>(baseURL: URL, apiRequest: APIRequest<Output, Error>) {
+        let url = baseURL.appendingPathComponent(apiRequest.path)
 
         var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
 
-        if !endpoint.queryParameters.isEmpty {
-            components.queryItems = endpoint.queryParameters.sorted { $0.key < $1.key }.map(URLQueryItem.init)
+        if !apiRequest.queryParameters.isEmpty {
+            components.queryItems = apiRequest.queryParameters.sorted { $0.key < $1.key }.map(URLQueryItem.init)
         }
 
         self.init(url: components.url!)
 
-        httpMethod = endpoint.method.rawValue
-        httpBody = endpoint.body
+        httpMethod = apiRequest.method.rawValue
+        httpBody = apiRequest.body
 
-        for (field, value) in endpoint.headers {
+        for (field, value) in apiRequest.headers {
             addValue(value, forHTTPHeaderField: field.rawValue)
         }
     }

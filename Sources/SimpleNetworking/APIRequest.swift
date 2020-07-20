@@ -1,5 +1,5 @@
 //
-// Endpoint.swift
+// APIRequest.swift
 //
 // Copyright (c) 2020 Guille Gonzalez
 //
@@ -23,7 +23,7 @@
 
 import Foundation
 
-public struct Endpoint<Output, Error> {
+public struct APIRequest<Output, Error> {
     public enum Method: String {
         case get = "GET"
         case post = "POST"
@@ -59,7 +59,7 @@ public struct Endpoint<Output, Error> {
     }
 }
 
-public extension Endpoint where Output: Decodable, Error: Decodable {
+public extension APIRequest where Output: Decodable, Error: Decodable {
     init(
         method: Method,
         path: String,
@@ -103,7 +103,7 @@ public extension Endpoint where Output: Decodable, Error: Decodable {
     }
 }
 
-public extension Endpoint where Output == Void, Error: Decodable {
+public extension APIRequest where Output == Void, Error: Decodable {
     init<Input>(
         method: Method,
         path: String,
@@ -126,7 +126,7 @@ public extension Endpoint where Output == Void, Error: Decodable {
     }
 }
 
-public extension Endpoint where Output: Decodable, Error == Void {
+public extension APIRequest where Output: Decodable, Error == Void {
     init(
         method: Method,
         path: String,
@@ -170,7 +170,7 @@ public extension Endpoint where Output: Decodable, Error == Void {
     }
 }
 
-public extension Endpoint where Output == Void, Error == Void {
+public extension APIRequest where Output == Void, Error == Void {
     init<Input>(
         method: Method,
         path: String,

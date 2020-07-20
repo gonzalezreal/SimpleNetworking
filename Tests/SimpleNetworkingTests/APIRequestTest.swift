@@ -1,5 +1,5 @@
 //
-// EndpointTest.swift
+// APIRequestTest.swift
 //
 // Copyright (c) 2020 Guille Gonzalez
 //
@@ -24,10 +24,10 @@
 import SimpleNetworking
 import XCTest
 
-final class EndpointTest: XCTestCase {
-    func testEndpointWithoutQuery() {
+final class APIRequestTest: XCTestCase {
+    func testRequestWithoutQuery() {
         // given
-        let endpoint = Endpoint<User, Error>(
+        let request = APIRequest<User, Error>(
             method: .get,
             path: "test",
             headers: [.authorization: "Bearer 3xpo"]
@@ -37,15 +37,15 @@ final class EndpointTest: XCTestCase {
         expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Accept")
 
         // when
-        let result = URLRequest(baseURL: Fixtures.anyBaseURL, endpoint: endpoint)
+        let result = URLRequest(baseURL: Fixtures.anyBaseURL, apiRequest: request)
 
         // then
         XCTAssertEqual(result, expected)
     }
 
-    func testEndpointWithQuery() {
+    func testRequestWithQuery() {
         // given
-        let endpoint = Endpoint<User, Error>(
+        let request = APIRequest<User, Error>(
             method: .get,
             path: "test",
             headers: [.authorization: "Bearer 3xpo"],
@@ -56,16 +56,16 @@ final class EndpointTest: XCTestCase {
         expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Accept")
 
         // when
-        let result = URLRequest(baseURL: Fixtures.anyBaseURL, endpoint: endpoint)
+        let result = URLRequest(baseURL: Fixtures.anyBaseURL, apiRequest: request)
 
         // then
         XCTAssertEqual(result, expected)
     }
 
-    func testEndpointWithBodyAndOutput() throws {
+    func testRequestWithBodyAndOutput() throws {
         // given
         let user = User(name: "test")
-        let endpoint = try Endpoint<User, Error>(
+        let request = try APIRequest<User, Error>(
             method: .post,
             path: "user/new",
             headers: [.authorization: "Bearer 3xpo"],
@@ -80,16 +80,16 @@ final class EndpointTest: XCTestCase {
         expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Content-Type")
 
         // when
-        let result = URLRequest(baseURL: Fixtures.anyBaseURL, endpoint: endpoint)
+        let result = URLRequest(baseURL: Fixtures.anyBaseURL, apiRequest: request)
 
         // then
         XCTAssertEqual(result, expected)
     }
 
-    func testEndpointWithBody() throws {
+    func testRequestWithBody() throws {
         // given
         let user = User(name: "test")
-        let endpoint = try Endpoint<Void, Error>(
+        let request = try APIRequest<Void, Error>(
             method: .post,
             path: "user/new",
             headers: [.authorization: "Bearer 3xpo"],
@@ -103,7 +103,7 @@ final class EndpointTest: XCTestCase {
         expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Content-Type")
 
         // when
-        let result = URLRequest(baseURL: Fixtures.anyBaseURL, endpoint: endpoint)
+        let result = URLRequest(baseURL: Fixtures.anyBaseURL, apiRequest: request)
 
         // then
         XCTAssertEqual(result, expected)

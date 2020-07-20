@@ -1,5 +1,5 @@
 //
-// HTTPURLResponseAdditions.swift
+// HTTPURLResponse+Logging.swift
 //
 // Copyright (c) 2020 Guille Gonzalez
 //
