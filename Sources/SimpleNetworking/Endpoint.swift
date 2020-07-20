@@ -83,10 +83,10 @@ public struct Endpoint<Output, Error> {
     /// The `body` property is normally used as a payload for `.post`, `.put` and `.patch` requests.
     public let body: Data?
 
-    /// Called to decode an `Output` value from a valid response.
+    /// A closure that decodes a valid response into a value of type `Output`.
     public let output: (Data) throws -> Output
 
-    /// Called to decode an `Error` value from a valid response.
+    /// A closure that decodes an error response into a value of type `Error`.
     public let error: (Data) throws -> Error
 
     /// Intializes an endpoint.
