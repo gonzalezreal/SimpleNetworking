@@ -23,6 +23,20 @@
 
 import Foundation
 
+/// Defines additional headers and query parameters for an `APIClient`.
+///
+/// An `APIClientConfiguration` instance contains additional headers and query
+/// parameters that will be appended to each request made by an `APIClient`.
+///
+/// For example, a configuration that contains `"api_key"`and `"language"` parameters
+/// can be created like this:
+///
+///     let configuration = APIClientConfiguration(
+///         additionalQueryParameters: [
+///             "api_key": "20495f04-1a8c-4fd0-a9a5-aac8752afc86",
+///             "language": "es",
+///         ]
+///     )
 public struct APIClientConfiguration {
     public var additionalHeaders: [HeaderField: String]
     public var additionalQueryParameters: [String: String]
