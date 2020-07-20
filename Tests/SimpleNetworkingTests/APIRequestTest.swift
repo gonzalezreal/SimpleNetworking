@@ -123,6 +123,86 @@ final class APIRequestTest: XCTestCase {
         XCTAssertEqual(result.httpBody, try JSONEncoder().encode(user))
     }
 
+    func testPutRequest() {
+        // given
+        let request = APIRequest<User, Error>.put(
+            "/test/1",
+            headers: [.authorization: "Bearer 3xpo"]
+        )
+        var expected = URLRequest(url: Fixtures.anyURLWithPath("/test/1"))
+        expected.httpMethod = "PUT"
+        expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
+        expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Accept")
+
+        // when
+        let result = URLRequest(baseURL: Fixtures.anyBaseURL, apiRequest: request)
+
+        // then
+        XCTAssertEqual(result, expected)
+    }
+
+    func testPuttRequestWithBody() throws {
+        // given
+        let user = User(name: "test")
+        let request = try APIRequest<User, Error>.put(
+            "/user/edit",
+            headers: [.authorization: "Bearer 3xpo"],
+            body: user
+        )
+
+        var expected = URLRequest(url: Fixtures.anyURLWithPath("user/edit"))
+        expected.httpMethod = "PUT"
+        expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
+        expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Accept")
+        expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Content-Type")
+
+        // when
+        let result = URLRequest(baseURL: Fixtures.anyBaseURL, apiRequest: request)
+
+        // then
+        XCTAssertEqual(result, expected)
+        XCTAssertEqual(result.httpBody, try JSONEncoder().encode(user))
+    }
+
+    func testPutRequestWithoutResponse() {
+        // given
+        let request = APIRequest<Void, Error>.put(
+            "/test/1",
+            headers: [.authorization: "Bearer 3xpo"]
+        )
+        var expected = URLRequest(url: Fixtures.anyURLWithPath("/test/1"))
+        expected.httpMethod = "PUT"
+        expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
+
+        // when
+        let result = URLRequest(baseURL: Fixtures.anyBaseURL, apiRequest: request)
+
+        // then
+        XCTAssertEqual(result, expected)
+    }
+
+    func testPutRequestWithBodyButWithoutResponse() throws {
+        // given
+        let user = User(name: "test")
+        let request = try APIRequest<Void, Error>.put(
+            "/user/edit",
+            headers: [.authorization: "Bearer 3xpo"],
+            body: user
+        )
+
+        var expected = URLRequest(url: Fixtures.anyURLWithPath("user/edit"))
+        expected.httpMethod = "PUT"
+        expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
+        expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Content-Type")
+
+        // when
+        let result = URLRequest(baseURL: Fixtures.anyBaseURL, apiRequest: request)
+
+        // then
+        XCTAssertEqual(result, expected)
+        XCTAssertEqual(result.httpBody, try JSONEncoder().encode(user))
+    }
+
     func testDeleteRequest() {
         // given
         let request = APIRequest<User, Error>.delete(

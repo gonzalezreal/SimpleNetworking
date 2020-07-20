@@ -130,6 +130,73 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
         )
     }
 
+    /// Creates a `PUT` request.
+    ///
+    /// - Parameters:
+    ///   - path: The route to the request endpoint.
+    ///   - headers: The headers that are passed with the request.
+    ///   - parameters: The parameters that are passed with the request.
+    ///   - jsonDecoder: The JSON decoder that will be used to decode valid and error responses.
+    /// - Returns: A `PUT` API request.
+    ///
+    /// This method uses the provided JSON decoder to decode valid and error responses for the request.
+    ///
+    /// Notice that this initializer automatically adds the `"Accept: application/json"` header to
+    /// the request.
+    ///
+    static func put(
+        _ path: String,
+        headers: [HeaderField: String] = [:],
+        parameters: [String: CustomStringConvertible] = [:],
+        jsonDecoder: JSONDecoder = JSONDecoder()
+    ) -> APIRequest {
+        APIRequest(
+            method: .put,
+            path: path,
+            headers: [
+                .accept: ContentType.json.rawValue,
+            ].merging(headers) { _, new in new },
+            parameters: parameters,
+            body: nil,
+            output: { try jsonDecoder.decode(Output.self, from: $0) },
+            error: { try jsonDecoder.decode(Error.self, from: $0) }
+        )
+    }
+
+    /// Creates a `PUT` request with a body payload.
+    ///
+    /// - Parameters:
+    ///   - path: The route to the request endpoint.
+    ///   - headers: The headers that are passed with the request.
+    ///   - body: The `Encodable` body payload for the request.
+    ///   - jsonDecoder: The JSON decoder that will be used to decode valid and error responses.
+    ///   - jsonEncoder: The JSON encoder that is  used to encode the `body` parameter.
+    /// - Returns: A `PUT` API request.
+    ///
+    /// Notice that this initializer automatically adds the `"Content-Type: application/json"`
+    /// and `"Accept: application/json"` headers to the request.
+    ///
+    static func put<Body>(
+        _ path: String,
+        headers: [HeaderField: String] = [:],
+        body: Body,
+        jsonDecoder: JSONDecoder = JSONDecoder(),
+        jsonEncoder: JSONEncoder = JSONEncoder()
+    ) throws -> APIRequest where Body: Encodable {
+        APIRequest(
+            method: .put,
+            path: path,
+            headers: [
+                .accept: ContentType.json.rawValue,
+                .contentType: ContentType.json.rawValue,
+            ].merging(headers) { _, new in new },
+            parameters: [:],
+            body: try jsonEncoder.encode(body),
+            output: { try jsonDecoder.decode(Output.self, from: $0) },
+            error: { try jsonDecoder.decode(Error.self, from: $0) }
+        )
+    }
+
     /// Creates a `DELETE` request.
     ///
     /// - Parameters:
@@ -205,10 +272,10 @@ public extension APIRequest where Output == Void, Error: Decodable {
     ///   - path: The route to the request endpoint.
     ///   - headers: The headers that are passed with the request.
     ///   - parameters: The parameters that are passed with the request.
-    ///   - jsonDecoder: The JSON decoder that will be used to decode valid and error responses.
+    ///   - jsonDecoder: The JSON decoder that will be used to decode error responses.
     /// - Returns: A `POST` API request.
     ///
-    /// This method uses the provided JSON decoder to decode valid and error responses for the request.
+    /// This method uses the provided JSON decoder to decode error responses for the request.
     ///
     static func post(
         _ path: String,
@@ -233,7 +300,7 @@ public extension APIRequest where Output == Void, Error: Decodable {
     ///   - path: The route to the request endpoint.
     ///   - headers: The headers that are passed with the request.
     ///   - body: The `Encodable` body payload for the request.
-    ///   - jsonDecoder: The JSON decoder that will be used to decode valid and error responses.
+    ///   - jsonDecoder: The JSON decoder that will be used to decode error responses.
     ///   - jsonEncoder: The JSON encoder that is  used to encode the `body` parameter.
     /// - Returns: A `POST` API request.
     ///
@@ -259,16 +326,76 @@ public extension APIRequest where Output == Void, Error: Decodable {
         )
     }
 
+    /// Creates a `PUT` request.
+    ///
+    /// - Parameters:
+    ///   - path: The route to the request endpoint.
+    ///   - headers: The headers that are passed with the request.
+    ///   - parameters: The parameters that are passed with the request.
+    ///   - jsonDecoder: The JSON decoder that will be used to decode error responses.
+    /// - Returns: A `PUT` API request.
+    ///
+    /// This method uses the provided JSON decoder to decode error responses for the request.
+    ///
+    static func put(
+        _ path: String,
+        headers: [HeaderField: String] = [:],
+        parameters: [String: CustomStringConvertible] = [:],
+        jsonDecoder: JSONDecoder = JSONDecoder()
+    ) -> APIRequest {
+        APIRequest(
+            method: .put,
+            path: path,
+            headers: headers,
+            parameters: parameters,
+            body: nil,
+            output: { _ in () },
+            error: { try jsonDecoder.decode(Error.self, from: $0) }
+        )
+    }
+
+    /// Creates a `PUT` request with a body payload.
+    ///
+    /// - Parameters:
+    ///   - path: The route to the request endpoint.
+    ///   - headers: The headers that are passed with the request.
+    ///   - body: The `Encodable` body payload for the request.
+    ///   - jsonDecoder: The JSON decoder that will be used to decode valid and error responses.
+    ///   - jsonEncoder: The JSON encoder that is  used to encode the `body` parameter.
+    /// - Returns: A `PUT` API request.
+    ///
+    /// This method automatically adds the `"Content-Type: application/json"` header to the request.
+    ///
+    static func put<Body>(
+        _ path: String,
+        headers: [HeaderField: String] = [:],
+        body: Body,
+        jsonDecoder: JSONDecoder = JSONDecoder(),
+        jsonEncoder: JSONEncoder = JSONEncoder()
+    ) throws -> APIRequest where Body: Encodable {
+        APIRequest(
+            method: .put,
+            path: path,
+            headers: [
+                .contentType: ContentType.json.rawValue,
+            ].merging(headers) { _, new in new },
+            parameters: [:],
+            body: try jsonEncoder.encode(body),
+            output: { _ in () },
+            error: { try jsonDecoder.decode(Error.self, from: $0) }
+        )
+    }
+
     /// Creates a `DELETE` request.
     ///
     /// - Parameters:
     ///   - path: The route to the request endpoint.
     ///   - headers: The headers that are passed with the request.
     ///   - parameters: The parameters that are passed with the request.
-    ///   - jsonDecoder: The JSON decoder that will be used to decode valid and error responses.
+    ///   - jsonDecoder: The JSON decoder that will be used to decode error responses.
     /// - Returns: A `DELETE` API request.
     ///
-    /// This method uses the provided JSON decoder to decode valid and error responses for the request.
+    /// This method uses the provided JSON decoder to decode error responses for the request.
     ///
     static func delete(
         _ path: String,
@@ -293,7 +420,7 @@ public extension APIRequest where Output == Void, Error: Decodable {
     ///   - path: The route to the request endpoint.
     ///   - headers: The headers that are passed with the request.
     ///   - body: The `Encodable` body payload for the request.
-    ///   - jsonDecoder: The JSON decoder that will be used to decode valid and error responses.
+    ///   - jsonDecoder: The JSON decoder that will be used to decode error responses.
     ///   - jsonEncoder: The JSON encoder that is  used to encode the `body` parameter.
     /// - Returns: A `DELETE` API request.
     ///
