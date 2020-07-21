@@ -54,7 +54,7 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
             method: .get,
             path: path,
             headers: [
-                .accept: ContentType.json.rawValue,
+                .accept: ContentType.json,
             ].merging(headers) { _, new in new },
             parameters: parameters,
             body: nil,
@@ -87,7 +87,7 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
             method: .post,
             path: path,
             headers: [
-                .accept: ContentType.json.rawValue,
+                .accept: ContentType.json,
             ].merging(headers) { _, new in new },
             parameters: parameters,
             body: nil,
@@ -120,8 +120,8 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
             method: .post,
             path: path,
             headers: [
-                .accept: ContentType.json.rawValue,
-                .contentType: ContentType.json.rawValue,
+                .accept: ContentType.json,
+                .contentType: ContentType.json,
             ].merging(headers) { _, new in new },
             parameters: [:],
             body: try jsonEncoder.encode(body),
@@ -154,7 +154,7 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
             method: .put,
             path: path,
             headers: [
-                .accept: ContentType.json.rawValue,
+                .accept: ContentType.json,
             ].merging(headers) { _, new in new },
             parameters: parameters,
             body: nil,
@@ -187,8 +187,8 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
             method: .put,
             path: path,
             headers: [
-                .accept: ContentType.json.rawValue,
-                .contentType: ContentType.json.rawValue,
+                .accept: ContentType.json,
+                .contentType: ContentType.json,
             ].merging(headers) { _, new in new },
             parameters: [:],
             body: try jsonEncoder.encode(body),
@@ -221,8 +221,8 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
             method: .patch,
             path: path,
             headers: [
-                .accept: ContentType.json.rawValue,
-                .contentType: ContentType.json.rawValue,
+                .accept: ContentType.json,
+                .contentType: ContentType.json,
             ].merging(headers) { _, new in new },
             parameters: [:],
             body: try jsonEncoder.encode(body),
@@ -255,7 +255,7 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
             method: .delete,
             path: path,
             headers: [
-                .accept: ContentType.json.rawValue,
+                .accept: ContentType.json,
             ].merging(headers) { _, new in new },
             parameters: parameters,
             body: nil,
@@ -288,8 +288,8 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
             method: .delete,
             path: path,
             headers: [
-                .accept: ContentType.json.rawValue,
-                .contentType: ContentType.json.rawValue,
+                .accept: ContentType.json,
+                .contentType: ContentType.json,
             ].merging(headers) { _, new in new },
             parameters: [:],
             body: try jsonEncoder.encode(body),
@@ -351,7 +351,7 @@ public extension APIRequest where Output == Void, Error: Decodable {
             method: .post,
             path: path,
             headers: [
-                .contentType: ContentType.json.rawValue,
+                .contentType: ContentType.json,
             ].merging(headers) { _, new in new },
             parameters: [:],
             body: try jsonEncoder.encode(body),
@@ -411,7 +411,7 @@ public extension APIRequest where Output == Void, Error: Decodable {
             method: .put,
             path: path,
             headers: [
-                .contentType: ContentType.json.rawValue,
+                .contentType: ContentType.json,
             ].merging(headers) { _, new in new },
             parameters: [:],
             body: try jsonEncoder.encode(body),
@@ -443,7 +443,7 @@ public extension APIRequest where Output == Void, Error: Decodable {
             method: .patch,
             path: path,
             headers: [
-                .contentType: ContentType.json.rawValue,
+                .contentType: ContentType.json,
             ].merging(headers) { _, new in new },
             parameters: [:],
             body: try jsonEncoder.encode(body),
@@ -503,7 +503,7 @@ public extension APIRequest where Output == Void, Error: Decodable {
             method: .delete,
             path: path,
             headers: [
-                .contentType: ContentType.json.rawValue,
+                .contentType: ContentType.json,
             ].merging(headers) { _, new in new },
             parameters: [:],
             body: try jsonEncoder.encode(body),

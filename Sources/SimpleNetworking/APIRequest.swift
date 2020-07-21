@@ -74,7 +74,7 @@ public struct APIRequest<Output, Error> {
     public let path: String
 
     /// The headers that are passed with the request.
-    public let headers: [HeaderField: String]
+    public let headers: [HeaderField: CustomStringConvertible]
 
     /// The parameters that are passed with the request.
     ///
@@ -105,7 +105,7 @@ public struct APIRequest<Output, Error> {
     public init(
         method: Method,
         path: String,
-        headers: [HeaderField: String],
+        headers: [HeaderField: CustomStringConvertible],
         parameters: [String: CustomStringConvertible],
         body: Data?,
         output: @escaping (Data) throws -> Output,

@@ -126,24 +126,24 @@
     private extension APIClientTest {
         func givenAnyValidResponse() {
             var request = URLRequest(url: Fixtures.anyURLWithPath("user", query: "api_key=test"))
-            request.addValue(ContentType.json.rawValue, forHTTPHeaderField: HeaderField.accept.rawValue)
-            request.addValue("Bearer 3xpo", forHTTPHeaderField: HeaderField.authorization.rawValue)
+            request.addValue("application/json", forHTTPHeaderField: "Accept")
+            request.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
 
             HTTPStubProtocol.stubRequest(request, data: Fixtures.anyValidResponse, statusCode: 200)
         }
 
         func givenAnyErrorResponse() {
             var request = URLRequest(url: Fixtures.anyURLWithPath("user", query: "api_key=test"))
-            request.addValue(ContentType.json.rawValue, forHTTPHeaderField: HeaderField.accept.rawValue)
-            request.addValue("Bearer 3xpo", forHTTPHeaderField: HeaderField.authorization.rawValue)
+            request.addValue("application/json", forHTTPHeaderField: "Accept")
+            request.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
 
             HTTPStubProtocol.stubRequest(request, data: Fixtures.anyErrorResponse, statusCode: 404)
         }
 
         func givenAnyInvalidResponse() {
             var request = URLRequest(url: Fixtures.anyURLWithPath("user", query: "api_key=test"))
-            request.addValue(ContentType.json.rawValue, forHTTPHeaderField: HeaderField.accept.rawValue)
-            request.addValue("Bearer 3xpo", forHTTPHeaderField: HeaderField.authorization.rawValue)
+            request.addValue("application/json", forHTTPHeaderField: "Accept")
+            request.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
 
             HTTPStubProtocol.stubRequest(request, data: Fixtures.anyInvalidResponse, statusCode: 200)
         }

@@ -62,7 +62,7 @@ extension URLRequest {
         httpBody = apiRequest.body
 
         for (field, value) in apiRequest.headers {
-            addValue(value, forHTTPHeaderField: field.rawValue)
+            addValue(value.description, forHTTPHeaderField: field.rawValue)
         }
     }
 

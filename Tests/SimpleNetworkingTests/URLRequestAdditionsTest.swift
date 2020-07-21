@@ -41,11 +41,11 @@ final class URLRequestAdditionsTest: XCTestCase {
     func testAnyRequestAddingHeadersReturnsExpectedRequest() {
         // given
         var anyRequest = URLRequest(url: Fixtures.anyURLWithPath("test"))
-        anyRequest.addValue(ContentType.json.rawValue, forHTTPHeaderField: HeaderField.accept.rawValue)
+        anyRequest.addValue("application/json", forHTTPHeaderField: "Accept")
 
         var expected = URLRequest(url: Fixtures.anyURLWithPath("test"))
-        expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: HeaderField.accept.rawValue)
-        expected.addValue("Bearer: LoremFistrumCaballo", forHTTPHeaderField: HeaderField.authorization.rawValue)
+        expected.addValue("application/json", forHTTPHeaderField: "Accept")
+        expected.addValue("Bearer: LoremFistrumCaballo", forHTTPHeaderField: "Authorization")
 
         // when
         let result = anyRequest.addingHeaders([.authorization: "Bearer: LoremFistrumCaballo"])
@@ -68,8 +68,8 @@ final class URLRequestAdditionsTest: XCTestCase {
     func testAnyRequestWithHeadersLogDescription() {
         // given
         var anyRequest = URLRequest(url: Fixtures.anyURLWithPath("test"))
-        anyRequest.addValue(ContentType.json.rawValue, forHTTPHeaderField: HeaderField.accept.rawValue)
-        anyRequest.addValue("Bearer: LoremFistrumCaballo", forHTTPHeaderField: HeaderField.authorization.rawValue)
+        anyRequest.addValue("application/json", forHTTPHeaderField: "Accept")
+        anyRequest.addValue("Bearer: LoremFistrumCaballo", forHTTPHeaderField: "Authorization")
         let expected = """
         [REQUEST] GET https://example.com/test
          ├─ Headers
@@ -91,7 +91,7 @@ final class URLRequestAdditionsTest: XCTestCase {
         anyRequest.httpBody = """
         {"foo": "bar"}
         """.data(using: .utf8)
-        anyRequest.addValue(ContentType.json.rawValue, forHTTPHeaderField: HeaderField.contentType.rawValue)
+        anyRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
         let expected = """
         [REQUEST] POST https://example.com/test
          ├─ Headers
