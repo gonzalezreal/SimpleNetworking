@@ -41,7 +41,7 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
     ///         parameters: ["page": 1]
     ///     )
     ///
-    /// Notice that this initializer automatically adds the `"Accept: application/json"` header to
+    /// Notice that this method automatically adds the `"Accept: application/json"` header to
     /// the request.
     ///
     static func get(
@@ -74,7 +74,7 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
     ///
     /// This method uses the provided JSON decoder to decode valid and error responses for the request.
     ///
-    /// Notice that this initializer automatically adds the `"Accept: application/json"` header to
+    /// Notice that this method automatically adds the `"Accept: application/json"` header to
     /// the request.
     ///
     static func post(
@@ -106,7 +106,7 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
     ///   - jsonEncoder: The JSON encoder that is  used to encode the `body` parameter.
     /// - Returns: A `POST` API request.
     ///
-    /// Notice that this initializer automatically adds the `"Content-Type: application/json"`
+    /// Notice that this method automatically adds the `"Content-Type: application/json"`
     /// and `"Accept: application/json"` headers to the request.
     ///
     static func post<Body>(
@@ -141,7 +141,7 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
     ///
     /// This method uses the provided JSON decoder to decode valid and error responses for the request.
     ///
-    /// Notice that this initializer automatically adds the `"Accept: application/json"` header to
+    /// Notice that this method automatically adds the `"Accept: application/json"` header to
     /// the request.
     ///
     static func put(
@@ -173,7 +173,7 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
     ///   - jsonEncoder: The JSON encoder that is  used to encode the `body` parameter.
     /// - Returns: A `PUT` API request.
     ///
-    /// Notice that this initializer automatically adds the `"Content-Type: application/json"`
+    /// Notice that this method automatically adds the `"Content-Type: application/json"`
     /// and `"Accept: application/json"` headers to the request.
     ///
     static func put<Body>(
@@ -207,7 +207,7 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
     ///   - jsonEncoder: The JSON encoder that is  used to encode the `body` parameter.
     /// - Returns: A `PATCH` API request.
     ///
-    /// Notice that this initializer automatically adds the `"Content-Type: application/json"`
+    /// Notice that this method automatically adds the `"Content-Type: application/json"`
     /// and `"Accept: application/json"` headers to the request.
     ///
     static func patch<Body>(
@@ -242,7 +242,7 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
     ///
     /// This method uses the provided JSON decoder to decode valid and error responses for the request.
     ///
-    /// Notice that this initializer automatically adds the `"Accept: application/json"` header to
+    /// Notice that this method automatically adds the `"Accept: application/json"` header to
     /// the request.
     ///
     static func delete(
@@ -274,7 +274,7 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
     ///   - jsonEncoder: The JSON encoder that is  used to encode the `body` parameter.
     /// - Returns: A `DELETE` API request.
     ///
-    /// Notice that this initializer automatically adds the `"Content-Type: application/json"`
+    /// Notice that this method automatically adds the `"Content-Type: application/json"`
     /// and `"Accept: application/json"` headers to the request.
     ///
     static func delete<Body>(
