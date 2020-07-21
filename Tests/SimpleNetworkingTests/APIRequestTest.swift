@@ -141,7 +141,7 @@ final class APIRequestTest: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
-    func testPuttRequestWithBody() throws {
+    func testPutRequestWithBody() throws {
         // given
         let user = User(name: "test")
         let request = try APIRequest<User, Error>.put(
@@ -192,6 +192,51 @@ final class APIRequestTest: XCTestCase {
 
         var expected = URLRequest(url: Fixtures.anyURLWithPath("user/edit"))
         expected.httpMethod = "PUT"
+        expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
+        expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Content-Type")
+
+        // when
+        let result = URLRequest(baseURL: Fixtures.anyBaseURL, apiRequest: request)
+
+        // then
+        XCTAssertEqual(result, expected)
+        XCTAssertEqual(result.httpBody, try JSONEncoder().encode(user))
+    }
+
+    func testPatchRequestWithBody() throws {
+        // given
+        let user = User(name: "test")
+        let request = try APIRequest<User, Error>.patch(
+            "/user/edit",
+            headers: [.authorization: "Bearer 3xpo"],
+            body: user
+        )
+
+        var expected = URLRequest(url: Fixtures.anyURLWithPath("user/edit"))
+        expected.httpMethod = "PATCH"
+        expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
+        expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Accept")
+        expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Content-Type")
+
+        // when
+        let result = URLRequest(baseURL: Fixtures.anyBaseURL, apiRequest: request)
+
+        // then
+        XCTAssertEqual(result, expected)
+        XCTAssertEqual(result.httpBody, try JSONEncoder().encode(user))
+    }
+
+    func testPatchRequestWithBodyButWithoutResponse() throws {
+        // given
+        let user = User(name: "test")
+        let request = try APIRequest<Void, Error>.patch(
+            "/user/edit",
+            headers: [.authorization: "Bearer 3xpo"],
+            body: user
+        )
+
+        var expected = URLRequest(url: Fixtures.anyURLWithPath("user/edit"))
+        expected.httpMethod = "PATCH                "
         expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
         expected.addValue(ContentType.json.rawValue, forHTTPHeaderField: "Content-Type")
 

@@ -197,6 +197,40 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
         )
     }
 
+    /// Creates a `PATCH` request with a body payload.
+    ///
+    /// - Parameters:
+    ///   - path: The route to the request endpoint.
+    ///   - headers: The headers that are passed with the request.
+    ///   - body: The `Encodable` body payload for the request.
+    ///   - jsonDecoder: The JSON decoder that will be used to decode valid and error responses.
+    ///   - jsonEncoder: The JSON encoder that is  used to encode the `body` parameter.
+    /// - Returns: A `PATCH` API request.
+    ///
+    /// Notice that this initializer automatically adds the `"Content-Type: application/json"`
+    /// and `"Accept: application/json"` headers to the request.
+    ///
+    static func patch<Body>(
+        _ path: String,
+        headers: [HeaderField: String] = [:],
+        body: Body,
+        jsonDecoder: JSONDecoder = JSONDecoder(),
+        jsonEncoder: JSONEncoder = JSONEncoder()
+    ) throws -> APIRequest where Body: Encodable {
+        APIRequest(
+            method: .patch,
+            path: path,
+            headers: [
+                .accept: ContentType.json.rawValue,
+                .contentType: ContentType.json.rawValue,
+            ].merging(headers) { _, new in new },
+            parameters: [:],
+            body: try jsonEncoder.encode(body),
+            output: { try jsonDecoder.decode(Output.self, from: $0) },
+            error: { try jsonDecoder.decode(Error.self, from: $0) }
+        )
+    }
+
     /// Creates a `DELETE` request.
     ///
     /// - Parameters:
@@ -375,6 +409,38 @@ public extension APIRequest where Output == Void, Error: Decodable {
     ) throws -> APIRequest where Body: Encodable {
         APIRequest(
             method: .put,
+            path: path,
+            headers: [
+                .contentType: ContentType.json.rawValue,
+            ].merging(headers) { _, new in new },
+            parameters: [:],
+            body: try jsonEncoder.encode(body),
+            output: { _ in () },
+            error: { try jsonDecoder.decode(Error.self, from: $0) }
+        )
+    }
+
+    /// Creates a `PATCH` request with a body payload.
+    ///
+    /// - Parameters:
+    ///   - path: The route to the request endpoint.
+    ///   - headers: The headers that are passed with the request.
+    ///   - body: The `Encodable` body payload for the request.
+    ///   - jsonDecoder: The JSON decoder that will be used to decode valid and error responses.
+    ///   - jsonEncoder: The JSON encoder that is  used to encode the `body` parameter.
+    /// - Returns: A `PATCH` API request.
+    ///
+    /// This method automatically adds the `"Content-Type: application/json"` header to the request.
+    ///
+    static func patch<Body>(
+        _ path: String,
+        headers: [HeaderField: String] = [:],
+        body: Body,
+        jsonDecoder: JSONDecoder = JSONDecoder(),
+        jsonEncoder: JSONEncoder = JSONEncoder()
+    ) throws -> APIRequest where Body: Encodable {
+        APIRequest(
+            method: .patch,
             path: path,
             headers: [
                 .contentType: ContentType.json.rawValue,
