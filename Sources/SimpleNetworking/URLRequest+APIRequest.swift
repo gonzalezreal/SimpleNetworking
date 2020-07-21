@@ -50,8 +50,10 @@ extension URLRequest {
 
         var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
 
-        if !apiRequest.queryParameters.isEmpty {
-            components.queryItems = apiRequest.queryParameters.sorted { $0.key < $1.key }.map(URLQueryItem.init)
+        if !apiRequest.parameters.isEmpty {
+            components.queryItems = apiRequest.parameters.sorted { $0.key < $1.key }.map { name, value in
+                URLQueryItem(name: name, value: value.description)
+            }
         }
 
         self.init(url: components.url!)
@@ -60,17 +62,20 @@ extension URLRequest {
         httpBody = apiRequest.body
 
         for (field, value) in apiRequest.headers {
-            addValue(value, forHTTPHeaderField: field.rawValue)
+            addValue(value.description, forHTTPHeaderField: field.rawValue)
         }
     }
 
     /// Returns a new URL request by adding the given query parameters to this request.
-    public func addingQueryParameters(_ parameters: [String: String]) -> URLRequest {
+    public func addingParameters(_ parameters: [String: CustomStringConvertible]) -> URLRequest {
         guard !parameters.isEmpty else { return self }
 
         var components = URLComponents(url: url!, resolvingAgainstBaseURL: false)!
 
-        let queryItems = (components.queryItems ?? []) + parameters.map(URLQueryItem.init)
+        let queryItems = (components.queryItems ?? []) + parameters.map { name, value in
+            URLQueryItem(name: name, value: value.description)
+        }
+
         components.queryItems = queryItems.sorted { $0.name < $1.name }
 
         var result = self

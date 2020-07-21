@@ -23,6 +23,18 @@
 
 import Foundation
 
-public enum ContentType: String {
-    case json = "application/json"
+public struct ContentType: Hashable, Equatable, RawRepresentable, CustomStringConvertible {
+    public let rawValue: String
+
+    public var description: String {
+        rawValue
+    }
+
+    public init(rawValue: String) {
+        self.rawValue = rawValue
+    }
+}
+
+public extension ContentType {
+    static let json = ContentType(rawValue: "application/json")
 }

@@ -69,7 +69,7 @@
         public func response<Output, Error>(for apiRequest: APIRequest<Output, Error>) -> AnyPublisher<Output, APIClientError<Error>> {
             let urlRequest = URLRequest(baseURL: baseURL, apiRequest: apiRequest)
                 .addingHeaders(configuration.additionalHeaders)
-                .addingQueryParameters(configuration.additionalQueryParameters)
+                .addingParameters(configuration.additionalParameters)
 
             logger.debug("\(urlRequest.logDescription)")
 

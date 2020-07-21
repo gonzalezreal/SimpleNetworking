@@ -32,20 +32,20 @@ import Foundation
 /// can be created like this:
 ///
 ///     let configuration = APIClientConfiguration(
-///         additionalQueryParameters: [
+///         additionalParameters: [
 ///             "api_key": "20495f04-1a8c-4fd0-a9a5-aac8752afc86",
 ///             "language": "es",
 ///         ]
 ///     )
 public struct APIClientConfiguration {
     public var additionalHeaders: [HeaderField: String]
-    public var additionalQueryParameters: [String: String]
+    public var additionalParameters: [String: CustomStringConvertible]
 
     public init(
         additionalHeaders: [HeaderField: String] = [:],
-        additionalQueryParameters: [String: String] = [:]
+        additionalParameters: [String: CustomStringConvertible] = [:]
     ) {
         self.additionalHeaders = additionalHeaders
-        self.additionalQueryParameters = additionalQueryParameters
+        self.additionalParameters = additionalParameters
     }
 }
