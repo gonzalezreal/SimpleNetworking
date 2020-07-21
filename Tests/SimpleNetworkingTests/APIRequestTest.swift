@@ -93,6 +93,7 @@ final class APIRequestTest: XCTestCase {
         var expected = URLRequest(url: Fixtures.anyURLWithPath("/test/1"))
         expected.httpMethod = "POST"
         expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
+        expected.addValue("application/json", forHTTPHeaderField: "Accept")
 
         // when
         let result = URLRequest(baseURL: Fixtures.anyBaseURL, apiRequest: request)
@@ -113,6 +114,7 @@ final class APIRequestTest: XCTestCase {
         var expected = URLRequest(url: Fixtures.anyURLWithPath("user/new"))
         expected.httpMethod = "POST"
         expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
+        expected.addValue("application/json", forHTTPHeaderField: "Accept")
         expected.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
         // when
@@ -173,6 +175,7 @@ final class APIRequestTest: XCTestCase {
         var expected = URLRequest(url: Fixtures.anyURLWithPath("/test/1"))
         expected.httpMethod = "PUT"
         expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
+        expected.addValue("application/json", forHTTPHeaderField: "Accept")
 
         // when
         let result = URLRequest(baseURL: Fixtures.anyBaseURL, apiRequest: request)
@@ -193,6 +196,7 @@ final class APIRequestTest: XCTestCase {
         var expected = URLRequest(url: Fixtures.anyURLWithPath("user/edit"))
         expected.httpMethod = "PUT"
         expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
+        expected.addValue("application/json", forHTTPHeaderField: "Accept")
         expected.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
         // when
@@ -238,6 +242,7 @@ final class APIRequestTest: XCTestCase {
         var expected = URLRequest(url: Fixtures.anyURLWithPath("user/edit"))
         expected.httpMethod = "PATCH"
         expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
+        expected.addValue("application/json", forHTTPHeaderField: "Accept")
         expected.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
         // when
@@ -297,6 +302,7 @@ final class APIRequestTest: XCTestCase {
         var expected = URLRequest(url: Fixtures.anyURLWithPath("/test/1"))
         expected.httpMethod = "DELETE"
         expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
+        expected.addValue("application/json", forHTTPHeaderField: "Accept")
 
         // when
         let result = URLRequest(baseURL: Fixtures.anyBaseURL, apiRequest: request)
@@ -316,6 +322,7 @@ final class APIRequestTest: XCTestCase {
         var expected = URLRequest(url: Fixtures.anyURLWithPath("/test/1"))
         expected.httpMethod = "DELETE"
         expected.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
+        expected.addValue("application/json", forHTTPHeaderField: "Accept")
         expected.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
         // when

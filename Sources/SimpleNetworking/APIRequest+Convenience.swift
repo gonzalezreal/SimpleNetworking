@@ -33,14 +33,6 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
     ///   - jsonDecoder: The JSON decoder that will be used to decode valid and error responses.
     /// - Returns: A `GET` API request.
     ///
-    /// This method uses the provided JSON decoder to decode valid and error responses for the request,
-    /// making possible to create API requests in a much nicer way:
-    ///
-    ///     let popularMovies = APIRequest<Page, Status>.get(
-    ///         "/movie/popular",
-    ///         parameters: ["page": 1]
-    ///     )
-    ///
     /// Notice that this method automatically adds the `"Accept: application/json"` header to
     /// the request.
     ///
@@ -71,8 +63,6 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
     ///   - parameters: The parameters that are passed with the request.
     ///   - jsonDecoder: The JSON decoder that will be used to decode valid and error responses.
     /// - Returns: A `POST` API request.
-    ///
-    /// This method uses the provided JSON decoder to decode valid and error responses for the request.
     ///
     /// Notice that this method automatically adds the `"Accept: application/json"` header to
     /// the request.
@@ -138,8 +128,6 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
     ///   - parameters: The parameters that are passed with the request.
     ///   - jsonDecoder: The JSON decoder that will be used to decode valid and error responses.
     /// - Returns: A `PUT` API request.
-    ///
-    /// This method uses the provided JSON decoder to decode valid and error responses for the request.
     ///
     /// Notice that this method automatically adds the `"Accept: application/json"` header to
     /// the request.
@@ -239,8 +227,6 @@ public extension APIRequest where Output: Decodable, Error: Decodable {
     ///   - parameters: The parameters that are passed with the request.
     ///   - jsonDecoder: The JSON decoder that will be used to decode valid and error responses.
     /// - Returns: A `DELETE` API request.
-    ///
-    /// This method uses the provided JSON decoder to decode valid and error responses for the request.
     ///
     /// Notice that this method automatically adds the `"Accept: application/json"` header to
     /// the request.
@@ -309,7 +295,8 @@ public extension APIRequest where Output == Void, Error: Decodable {
     ///   - jsonDecoder: The JSON decoder that will be used to decode error responses.
     /// - Returns: A `POST` API request.
     ///
-    /// This method uses the provided JSON decoder to decode error responses for the request.
+    /// Notice that this method automatically adds the `"Accept: application/json"` header
+    /// to the request.
     ///
     static func post(
         _ path: String,
@@ -320,7 +307,9 @@ public extension APIRequest where Output == Void, Error: Decodable {
         APIRequest(
             method: .post,
             path: path,
-            headers: headers,
+            headers: [
+                .accept: ContentType.json,
+            ].merging(headers) { _, new in new },
             parameters: parameters,
             body: nil,
             output: { _ in () },
@@ -338,7 +327,8 @@ public extension APIRequest where Output == Void, Error: Decodable {
     ///   - jsonEncoder: The JSON encoder that is  used to encode the `body` parameter.
     /// - Returns: A `POST` API request.
     ///
-    /// This method automatically adds the `"Content-Type: application/json"` header to the request.
+    /// Notice that this method automatically adds the `"Content-Type: application/json"`
+    /// and `"Accept: application/json"` headers to the request.
     ///
     static func post<Body>(
         _ path: String,
@@ -351,6 +341,7 @@ public extension APIRequest where Output == Void, Error: Decodable {
             method: .post,
             path: path,
             headers: [
+                .accept: ContentType.json,
                 .contentType: ContentType.json,
             ].merging(headers) { _, new in new },
             parameters: [:],
@@ -369,7 +360,8 @@ public extension APIRequest where Output == Void, Error: Decodable {
     ///   - jsonDecoder: The JSON decoder that will be used to decode error responses.
     /// - Returns: A `PUT` API request.
     ///
-    /// This method uses the provided JSON decoder to decode error responses for the request.
+    /// Notice that this method automatically adds the `"Accept: application/json"` header
+    /// to the request.
     ///
     static func put(
         _ path: String,
@@ -380,7 +372,9 @@ public extension APIRequest where Output == Void, Error: Decodable {
         APIRequest(
             method: .put,
             path: path,
-            headers: headers,
+            headers: [
+                .accept: ContentType.json,
+            ].merging(headers) { _, new in new },
             parameters: parameters,
             body: nil,
             output: { _ in () },
@@ -398,7 +392,8 @@ public extension APIRequest where Output == Void, Error: Decodable {
     ///   - jsonEncoder: The JSON encoder that is  used to encode the `body` parameter.
     /// - Returns: A `PUT` API request.
     ///
-    /// This method automatically adds the `"Content-Type: application/json"` header to the request.
+    /// Notice that this method automatically adds the `"Content-Type: application/json"`
+    /// and `"Accept: application/json"` headers to the request.
     ///
     static func put<Body>(
         _ path: String,
@@ -411,6 +406,7 @@ public extension APIRequest where Output == Void, Error: Decodable {
             method: .put,
             path: path,
             headers: [
+                .accept: ContentType.json,
                 .contentType: ContentType.json,
             ].merging(headers) { _, new in new },
             parameters: [:],
@@ -430,7 +426,8 @@ public extension APIRequest where Output == Void, Error: Decodable {
     ///   - jsonEncoder: The JSON encoder that is  used to encode the `body` parameter.
     /// - Returns: A `PATCH` API request.
     ///
-    /// This method automatically adds the `"Content-Type: application/json"` header to the request.
+    /// Notice that this method automatically adds the `"Content-Type: application/json"`
+    /// and `"Accept: application/json"` headers to the request.
     ///
     static func patch<Body>(
         _ path: String,
@@ -443,6 +440,7 @@ public extension APIRequest where Output == Void, Error: Decodable {
             method: .patch,
             path: path,
             headers: [
+                .accept: ContentType.json,
                 .contentType: ContentType.json,
             ].merging(headers) { _, new in new },
             parameters: [:],
@@ -461,7 +459,8 @@ public extension APIRequest where Output == Void, Error: Decodable {
     ///   - jsonDecoder: The JSON decoder that will be used to decode error responses.
     /// - Returns: A `DELETE` API request.
     ///
-    /// This method uses the provided JSON decoder to decode error responses for the request.
+    /// Notice that this method automatically adds the `"Accept: application/json"` header
+    /// to the request.
     ///
     static func delete(
         _ path: String,
@@ -472,7 +471,9 @@ public extension APIRequest where Output == Void, Error: Decodable {
         APIRequest(
             method: .delete,
             path: path,
-            headers: headers,
+            headers: [
+                .accept: ContentType.json,
+            ].merging(headers) { _, new in new },
             parameters: parameters,
             body: nil,
             output: { _ in () },
@@ -490,7 +491,8 @@ public extension APIRequest where Output == Void, Error: Decodable {
     ///   - jsonEncoder: The JSON encoder that is  used to encode the `body` parameter.
     /// - Returns: A `DELETE` API request.
     ///
-    /// This method automatically adds the `"Content-Type: application/json"` header to the request.
+    /// Notice that this method automatically adds the `"Content-Type: application/json"`
+    /// and `"Accept: application/json"` headers to the request.
     ///
     static func delete<Body>(
         _ path: String,
@@ -503,6 +505,7 @@ public extension APIRequest where Output == Void, Error: Decodable {
             method: .delete,
             path: path,
             headers: [
+                .accept: ContentType.json,
                 .contentType: ContentType.json,
             ].merging(headers) { _, new in new },
             parameters: [:],
