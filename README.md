@@ -4,104 +4,135 @@
 [![Swift Package Manager](https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat)](https://swift.org/package-manager)
 [![Twitter: @gonzalezreal](https://img.shields.io/badge/twitter-@gonzalezreal-blue.svg?style=flat)](https://twitter.com/gonzalezreal)
 
-**SimpleNetworking** is a Swift Package that helps you create scalable API clients. It uses [Combine](https://developer.apple.com/documentation/combine) to expose API responses, making it easy to compose and transform them.
+**SimpleNetworking** is a Swift Package that helps you create scalable API clients, simple and elegantly. It uses [Combine](https://developer.apple.com/documentation/combine) to expose API responses, making it easy to compose and transform them.
 
-It also includes other goodies, like logging and network request stubbing.
+It also includes other goodies, like logging and response stubbing.
 
 Let's explore all the features using [The Movie Database API](https://developers.themoviedb.org/3) as an example.
 
-- [Creating Endpoints](#creating-endpoints)
-- [Configuring API clients](#configuring-api-clients)
+- [Configuring the API client](#configuring-the-api-client)
+- [Creating API requests](#creating-api-requests)
+- [Handling errors](#handling-errors)
 - [Combining and transforming responses](#combining-and-transforming-responses)
+
 - [Logging](#logging)
 - [Stubbing network requests](#stubbing-network-requests)
 - [Installation](#installation)
 - [Help & Feedback](#help--feedback)
 
-## Creating Endpoints
-The `Endpoint` struct encapsulates an API request as well as the result type of the responses for that request.
+## Configuring the API client
+The API client is responsible for making requests to an API and handling its responses. To create an API client, you need to provide the base URL and, optionally, any additional parameters or headers that you would like to append to all requests, like an API key or an authorization header.
 
-For example, to implement the [Configuration Endpoint](https://developers.themoviedb.org/3/configuration/get-api-configuration), we start with the response model:
+```swift
+let tmdbClient = APIClient(
+    baseURL: URL(string: "https://api.themoviedb.org/3")!,
+    configuration: APIClientConfiguration(
+        additionalParameters: [
+            "api_key": "20495f041a8caac8752afc86",
+            "language": "es",
+        ]
+    )
+)
+```
+
+## Creating API requests
+The `APIRequest` type contains all the data required to make an API request, as well as the logic to decode valid and error responses from the request's endpoint.
+
+Before creating an API request, we need to model its valid and error responses, preferably as types conforming to `Decodable`.
+
+Usually, an API defines different valid response models, depending on the request, but a single error response model for all the requests. In the case of The Movie Database API, error responses take the form of a [`Status`](https://www.themoviedb.org/documentation/api/status-codes) value:
 
 ```Swift
-struct Configuration: Codable {
-    struct Images: Codable {
-        let secureBaseURL: URL
-        ...
-    }
-    
-    let images: Images
-    let changeKeys: [String]
+struct Status: Decodable {
+    var code: Int
+    var message: String
 
     enum CodingKeys: String, CodingKey {
-        case images
-        case changeKeys = "change_keys"
+        case code = "status_code"
+        case message = "status_message"
     }
 }
 ```
 
-We could create our endpoint as follows:
+Now, consider the [`GET /genre/movie/list`](https://developers.themoviedb.org/3/genres/get-movie-list) API request. This request returns the official list of genres for movies. We could implement a `GenreList` type for its response:
 
 ```Swift
-let endpoint = Endpoint<Configuration>(method: .get, path: "configuration")
-```
+struct Genre: Decodable {
+    var id: Int
+    var name: String
+}
 
-But we want our endpoints to be reusable, so we can implement a factory method or a static property in an extension:
-
-```Swift
-extension Endpoint where Output == Configuration {
-    static let configuration = Endpoint(method: .get, path: "configuration")
+struct GenreList: Decodable {
+    var genres: [Genre]
 }
 ```
 
-This way, you could obtain responses from that endpoint as follows:
+With these response models in place, we are ready to create the API request:
 
 ```Swift
-let subscription = theMovieDbClient.response(for: .configuration).sink(receiveValue: { config in
-    print("base url for images: \(config.images.secureBaseURL)")
-})
+let movieGenresRequest = APIRequest<GenreList, Status>.get("/genre/movie/list")
 ```
 
-You can customize many properties of an `Endpoint`: headers, query parameters, body, etc. Here are some additional examples:
-
-```Swift
-extension Endpoint where Output == Page<MovieResult> {
-    static func popularMovies(page: Int) -> Endpoint {
-        return Endpoint(
-            method: .get,
-            path: "movie/popular",
-            queryParameters: ["page": String(page)],
-            dateDecodingStrategy: .formatted(.theMovieDb)
-        )
-    }
-}
-
-extension Endpoint where Output == Session {
-    static func session(with token: Token) -> Endpoint {
-        return Endpoint(
-            method: .post,
-            path: "authentication/session/new",
-            body: token
-        )
-    }
-}
-```
-
-## Configuring API clients
-When creating an API client, you must specify a base URL and, optionally, the additional headers and query parameters that go with each request.
+But we can do better, and extend `APIClient` to provide a method to get the movie genres:
 
 ```Swift
 extension APIClient {
-    static func theMovieDb(apiKey: String, language: String) -> APIClient {
-        var configuration = APIClientConfiguration()
-        configuration.additionalQueryParameters = [
-            "api_key": apiKey,
-            "language": language,
-        ]
-        return APIClient(baseURL: URL(string: "https://api.themoviedb.org/3")!, configuration: configuration)
+    func movieGenres() -> AnyPublisher<GenreList, APIClientError<Status>> {
+        response(for: .get("/genre/movie/list"))
     }
 }
 ```
+
+The `response(for:)` method takes an `APIRequest` and returns a publisher that wraps sending the request and decoding its response. We can implement all the API methods by relying on it:
+
+```Swift
+extension APIClient {
+    func createSession(with token: Token) -> AnyPublisher<Session, APIClientError<Status>> {
+        response(for: .post("/authentication/session/new", body: token))
+    }
+    
+    func deleteSession(_ session: Session) -> AnyPublisher<Void, APIClientError<Status>> {
+        response(for: .delete("/authentication/session", body: session))
+    }
+    
+    ...
+    
+    func popularMovies(page: Int) -> AnyPublisher<Page<Movie>, APIClientError<Status>> {
+        response(for: .get("/movie/popular", parameters: ["page": page]))
+    }
+    
+    func topRatedMovies(page: Int) -> AnyPublisher<Page<Movie>, APIClientError<Status>> {
+        response(for: .get("/movie/top_rated", parameters: ["page": page]))
+    }
+    
+    ...
+}
+```
+
+## Handling errors
+Your app must be prepared to handle errors when working with an API client. **SimpleNetworking** provides [`APIClientError`](Sources/SimpleNetworking/APIClientError.swift), which unifies URL loading errors, JSON decoding errors, and specific API error responses in a single generic type.
+
+```Swift
+let cancellable = tmdbClient.movieGenres()
+    .catch { error in
+        switch error {
+        case .loadingError(let loadingError):
+            // Handle URL loading errors
+            ...
+        case .decodingError(let decodingError):
+            // Handle JSON decoding errors
+            ...
+        case .apiError(let apiError):
+            // Handle specific API errors
+            ...
+        }
+    }
+    .sink { movieGenres in
+        // handle response
+    }
+```
+
+The generic [`APIError`](Sources/SimpleNetworking/APIError.swift) type provides access to the HTTP status code and the API error response. 
 
 ## Combining and transforming responses
 Since `APIClient.response(from:)` method returns a [`Publisher`](https://developer.apple.com/documentation/combine/publisher), it is quite simple to combine responses and transform them for presentation.
