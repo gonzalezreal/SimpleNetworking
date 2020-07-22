@@ -14,16 +14,15 @@ Let's explore all the features using [The Movie Database API](https://developers
 - [Creating API requests](#creating-api-requests)
 - [Handling errors](#handling-errors)
 - [Combining and transforming responses](#combining-and-transforming-responses)
-
-- [Logging](#logging)
+- [Logging requests and responses](#logging-requests-and-responses)
 - [Stubbing network requests](#stubbing-network-requests)
 - [Installation](#installation)
 - [Help & Feedback](#help--feedback)
 
 ## Configuring the API client
-The API client is responsible for making requests to an API and handling its responses. To create an API client, you need to provide the base URL and, optionally, any additional parameters or headers that you would like to append to all requests, like an API key or an authorization header.
+The `APIClient` is responsible for making requests to an API and handling its responses. To create an API client, you need to provide the base URL and, optionally, any additional parameters or headers that you would like to append to all requests, like an API key or an authorization header.
 
-```swift
+```Swift
 let tmdbClient = APIClient(
     baseURL: URL(string: "https://api.themoviedb.org/3")!,
     configuration: APIClientConfiguration(
@@ -179,14 +178,22 @@ func popularItems(page: Int) -> AnyPublisher<[MovieItem], APIClientError<Status>
 }
 ```
 
-## Logging
-The `APIClient` class uses [SwiftLog](https://github.com/apple/swift-log) to log requests and responses. If you set its `logger.logLevel` to `.debug` you will start seeing requests and responses as they happen in your logs.
+## Logging requests and responses
+Each `APIClient` instance logs requests and responses using a [SwiftLog](https://github.com/apple/swift-log) logger.
+
+To see requests and responses logs as they happen, you need to specify the `.debug` log-level when constructing the APIClient.
 
 ```Swift
-let apiClient = APIClient(baseURL: URL(string: "https://api.themoviedb.org/3")!, logLevel: .debug)
+let tmdbClient = APIClient(
+    baseURL: URL(string: "https://api.themoviedb.org/3")!,
+    configuration: APIClientConfiguration(
+        ...
+    ),
+    logLevel: .debug
+)
 ```
 
-Here is an example of the output using the default `StreamLogHandler`:
+**SimpleNetworking** formats the headers and JSON responses, producing structured and readable logs. Here is an example of the output produced by a [`GET /genre/movie/list`](https://developers.themoviedb.org/3/genres/get-movie-list) request:
 
 ```
 2019-12-15T17:18:47+0100 debug: [REQUEST] GET https://api.themoviedb.org/3/genre/movie/list?language=en
@@ -219,8 +226,6 @@ Here is an example of the output using the default `StreamLogHandler`:
      },
  ...
 ```
-
-If you want to use [Apple's Unified Logging](https://developer.apple.com/documentation/os/logging) for your logs, you might want to try [UnifiedLogHandler](https://github.com/gonzalezreal/UnifiedLogging).
 
 ## Stubbing network requests
 Stubbing network requests can be useful when you are writing UI or integration tests and don't want to depend on the network being reachable.
