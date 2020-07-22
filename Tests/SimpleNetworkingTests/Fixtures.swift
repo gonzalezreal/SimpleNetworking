@@ -36,8 +36,6 @@ enum Fixtures {
     static let anyUser = User(name: "gonzalezreal")
     static let anyValidResponse = try! JSONEncoder().encode(anyUser)
     static let anyError = Error(message: "The resource you requested could not be found.")
-    static let anyErrorResponse = try! JSONEncoder().encode(anyError)
-    static let anyInvalidResponse = "invalid".data(using: .utf8)!
 
     static func anyURLWithPath(_ path: String, query: String? = nil) -> URL {
         let url = anyBaseURL.appendingPathComponent(path)

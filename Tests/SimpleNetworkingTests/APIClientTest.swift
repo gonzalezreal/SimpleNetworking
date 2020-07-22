@@ -46,9 +46,9 @@
             super.tearDown()
         }
 
-        func testAnyValidResponseReturnsOutput() {
+        func testAnyValidResponseReturnsOutput() throws {
             // given
-            givenAnyValidResponse()
+            try givenAnyValidResponse()
             let request = APIRequest<User, Error>.get("/user")
             let didReceiveValue = expectation(description: "didReceiveValue")
             var result: User?
@@ -94,9 +94,9 @@
             XCTAssertNotNil(result)
         }
 
-        func testAnyErrorResponseReturnsAPIError() {
+        func testAnyErrorResponseReturnsAPIError() throws {
             // given
-            givenAnyErrorResponse()
+            try givenAnyErrorResponse()
             let request = APIRequest<User, Error>.get("/user")
             let didFail = expectation(description: "didFail")
             var result: APIError<Error>?
@@ -124,28 +124,43 @@
 
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     private extension APIClientTest {
-        func givenAnyValidResponse() {
-            var request = URLRequest(url: Fixtures.anyURLWithPath("user", query: "api_key=test"))
-            request.addValue("application/json", forHTTPHeaderField: "Accept")
-            request.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
-
-            HTTPStubProtocol.stubRequest(request, data: Fixtures.anyValidResponse, statusCode: 200)
+        func givenAnyValidResponse() throws {
+            try HTTPStubProtocol.stub(
+                Fixtures.anyUser,
+                statusCode: 200,
+                for: APIRequest<User, Error>.get(
+                    "/user",
+                    headers: [.authorization: "Bearer 3xpo"],
+                    parameters: ["api_key": "test"]
+                ),
+                baseURL: Fixtures.anyBaseURL
+            )
         }
 
-        func givenAnyErrorResponse() {
-            var request = URLRequest(url: Fixtures.anyURLWithPath("user", query: "api_key=test"))
-            request.addValue("application/json", forHTTPHeaderField: "Accept")
-            request.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
-
-            HTTPStubProtocol.stubRequest(request, data: Fixtures.anyErrorResponse, statusCode: 404)
+        func givenAnyErrorResponse() throws {
+            try HTTPStubProtocol.stub(
+                Fixtures.anyError,
+                statusCode: 404,
+                for: APIRequest<User, Error>.get(
+                    "/user",
+                    headers: [.authorization: "Bearer 3xpo"],
+                    parameters: ["api_key": "test"]
+                ),
+                baseURL: Fixtures.anyBaseURL
+            )
         }
 
         func givenAnyInvalidResponse() {
-            var request = URLRequest(url: Fixtures.anyURLWithPath("user", query: "api_key=test"))
-            request.addValue("application/json", forHTTPHeaderField: "Accept")
-            request.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
-
-            HTTPStubProtocol.stubRequest(request, data: Fixtures.anyInvalidResponse, statusCode: 200)
+            HTTPStubProtocol.stub(
+                "invalid",
+                statusCode: 200,
+                for: APIRequest<User, Error>.get(
+                    "/user",
+                    headers: [.authorization: "Bearer 3xpo"],
+                    parameters: ["api_key": "test"]
+                ),
+                baseURL: Fixtures.anyBaseURL
+            )
         }
     }
 #endif
