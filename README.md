@@ -109,7 +109,7 @@ extension APIClient {
 ```
 
 ## Handling errors
-Your app must be prepared to handle errors when working with an API client. **SimpleNetworking** provides [`APIClientError`](Sources/SimpleNetworking/APIClientError.swift), which unifies URL loading errors, JSON decoding errors, and specific API error responses in a single generic type.
+Your app must be prepared to handle errors when working with an API client. SimpleNetworking provides [`APIClientError`](Sources/SimpleNetworking/APIClientError.swift), which unifies URL loading errors, JSON decoding errors, and specific API error responses in a single generic type.
 
 ```Swift
 let cancellable = tmdbClient.movieGenres()
@@ -193,7 +193,7 @@ let tmdbClient = APIClient(
 )
 ```
 
-**SimpleNetworking** formats the headers and JSON responses, producing structured and readable logs. Here is an example of the output produced by a [`GET /genre/movie/list`](https://developers.themoviedb.org/3/genres/get-movie-list) request:
+SimpleNetworking formats the headers and JSON responses, producing structured and readable logs. Here is an example of the output produced by a [`GET /genre/movie/list`](https://developers.themoviedb.org/3/genres/get-movie-list) request:
 
 ```
 2019-12-15T17:18:47+0100 debug: [REQUEST] GET https://api.themoviedb.org/3/genre/movie/list?language=en
@@ -227,30 +227,50 @@ let tmdbClient = APIClient(
  ...
 ```
 
-## Stubbing network requests
-Stubbing network requests can be useful when you are writing UI or integration tests and don't want to depend on the network being reachable.
+## Stubbing responses for API requests
+Stubbing responses can be useful when writing UI or integration tests to avoid depending on network reachability.
 
-You can use `HTTPStubProtocol` to stub a network request as follows:
+For this task, SimpleNetworking provides `HTTPStubProtocol`, a `URLProtocol` subclass that allows stubbing responses for specific API or URL requests.
 
-```Swift
-var request = URLRequest(url: Fixtures.anyURLWithPath("user", query: "api_key=test"))
-request.addValue(ContentType.json.rawValue, forHTTPHeaderField: HeaderField.accept.rawValue)
-request.addValue("Bearer 3xpo", forHTTPHeaderField: HeaderField.authorization.rawValue)
-
-HTTPStubProtocol.stubRequest(request, data: Fixtures.anyJSON, statusCode: 200)
-```
-
-For this to have the desired effect, you need to pass `URLSession.stubbed` as a parameter when constructing the `APIClient`.
+You can stub any `Encodable` value as a valid response for an API request:
 
 ```Swift
-override func setUp() {
-    super.setUp()
-
-    sut = APIClient(baseURL: Fixtures.anyBaseURL, configuration: configuration, session: .stubbed)
-}
+try HTTPStubProtocol.stub(
+    User(name: "gonzalezreal"),
+    statusCode: 200,
+    for: APIRequest<User, Error>.get(
+        "/user",
+        headers: [.authorization: "Bearer 3xpo"],
+        parameters: ["api_key": "a9a5aac8752afc86"]
+    ),
+    baseURL: URL(string: "https://example.com/api")!
+)
 ```
 
-You can check out [`APIClientTest`](Tests/SimpleNetworkingTests/APIClientTest.swift) for more information.
+Or as an error response for the same API request:
+
+```Swift
+try HTTPStubProtocol.stub(
+    Error(message: "The resource you requested could not be found."),
+    statusCode: 404,
+    for: APIRequest<User, Error>.get(
+        "/user",
+        headers: [.authorization: "Bearer 3xpo"],
+        parameters: ["api_key": "a9a5aac8752afc86"]
+    ),
+    baseURL: URL(string: "https://example.com/api")!
+)
+```
+
+To use stubbed responses, you need to pass `URLSession.stubbed` as a parameter when creating an `APIClient` instance:
+
+```Swift
+let apiClient = APIClient(
+    baseURL: URL(string: "https://example.com/api")!,
+    configuration: configuration,
+    session: .stubbed
+)
+```
 
 ## Installation
 **Using the Swift Package Manager**
@@ -258,12 +278,11 @@ You can check out [`APIClientTest`](Tests/SimpleNetworkingTests/APIClientTest.sw
 Add SimpleNetworking as a dependency to your `Package.swift` file. For more information, see the [Swift Package Manager documentation](https://github.com/apple/swift-package-manager/tree/master/Documentation).
 
 ```
-.package(url: "https://github.com/gonzalezreal/SimpleNetworking", from: "1.3.0")
+.package(url: "https://github.com/gonzalezreal/SimpleNetworking", from: "2.0.0")
 ```
 
 ## Related projects
-- [NetworkImage](https://github.com/gonzalezreal/NetworkImage)
-- [UnifiedLogHandler](https://github.com/gonzalezreal/UnifiedLogging)
+- [NetworkImage](https://github.com/gonzalezreal/NetworkImage), a Swift µpackage that provides image downloading and caching for your apps. It leverages the foundation `URLCache`, providing persistent and in-memory caches.
 
 ## Help & Feedback
 - [Open an issue](https://github.com/gonzalezreal/SimpleNetworking/issues/new) if you need help, if you found a bug, or if you want to discuss a feature request.
