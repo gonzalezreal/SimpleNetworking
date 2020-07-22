@@ -135,40 +135,44 @@ let cancellable = tmdbClient.movieGenres()
 The generic [`APIError`](Sources/SimpleNetworking/APIError.swift) type provides access to the HTTP status code and the API error response. 
 
 ## Combining and transforming responses
-Since `APIClient.response(from:)` method returns a [`Publisher`](https://developer.apple.com/documentation/combine/publisher), it is quite simple to combine responses and transform them for presentation.
+Since our API client wraps responses in a [`Publisher`](https://developer.apple.com/documentation/combine/publisher), it is quite simple to combine responses and transform them for presentation.
 
-Consider, for example, that we have to present a list of popular movies; including their title, genre, and cover. To build that list we need information from three different endpoints:
-* `.configuration`, to obtain the image base URL.
-* `.movieGenres`, to obtain the movie genres by id.
-* `.popularMovies(page:)`, to obtain the list of movies sorted by popularity.
+Consider, for example, that we have to present a list of popular movies, including their title, genre, and cover. To build that list, we need to issue three different requests.
+* [`GET /configuration`](https://developers.themoviedb.org/3/configuration/get-api-configuration), to get the base URL for images.
+* [`GET /genre/movie/list`](https://developers.themoviedb.org/3/genres/get-movie-list), to get the list of official genres for movies.
+* [`GET /movie/popular`](https://developers.themoviedb.org/3/movies/get-popular-movies), to get the list of the current popular movies.
 
 We could model an item in that list as follows:
 
 ```Swift
 struct MovieItem {
-    let title: String
-    let genres: String
-    let posterURL: URL?
+    var title: String
+    var posterURL: URL?
+    var genres: String
     
-    init(movieResult: MovieResult, imageBaseURL: URL, movieGenres: GenreList) {
-        ...
+    init(movie: Movie, imageBaseURL: URL, movieGenres: GenreList) {
+        self.title = movie.title
+        self.posterURL = imageBaseURL
+            .appendingPathComponent("w300")
+            .appendingPathComponent(movie.posterPath)
+        self.genres = ...
     }
 }
 ```
 
-To build the list, we can use the `zip` operator with the publishers returned by the `APIClient`.
+To build the list, we can use the `zip` operator with the publishers returned by the API client.
 
 ```Swift
-func popularItems() -> AnyPublisher<[MovieItem], Error> {
+func popularItems(page: Int) -> AnyPublisher<[MovieItem], APIClientError<Status>> {
     return Publishers.Zip3(
-        theMovieDbClient.response(for: .popularMovies(page: 1)),
-        theMovieDbClient.response(for: .configuration),
-        theMovieDbClient.response(for: .movieGenres)
+        tmdbClient.configuration(),
+        tmdbClient.movieGenres(),
+        tmdbClient.popularMovies(page: page)
     )
-    .map { (page, config, genres) -> [MovieItem] in
+    .map { (config, genres, page) -> [MovieItem] in
         let url = config.images.secureBaseURL
         return page.results.map {
-            MovieItem(movieResult: $0, imageBaseURL: url, movieGenres: genres)
+            MovieItem(movie: $0, imageBaseURL: url, movieGenres: genres)
         }
     }
     .eraseToAnyPublisher()
