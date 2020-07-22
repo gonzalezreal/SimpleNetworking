@@ -23,22 +23,41 @@
 
 import Foundation
 
-/// A `URLProtocol` subclass that stubs HTTP requests.
+/// `HTTPStubProtocol` is a `URLProtocol` subclass that allows stubbing responses for specific API or URL requests.
 ///
-/// You can use `HTTPStubProtocol` to stub a network request as follows:
+/// Stubbing responses can be useful when writing UI or integration tests to avoid depending on network reachability.
 ///
-///     var request = URLRequest(url: URL(string: "https://example.com/user?api_key=test")!)
-///     request.addValue("application/json", forHTTPHeaderField: "Accept")
-///     request.addValue("Bearer 3xpo", forHTTPHeaderField: "Authorization")
+/// You can stub any `Encodable` value as a valid response for an API request:
 ///
-///     let json = #"{"foo": "bar"}"#.data(using: .utf8)!
+///     try HTTPStubProtocol.stub(
+///         User(name: "gonzalezreal"),
+///         statusCode: 200,
+///         for: APIRequest<User, Error>.get(
+///             "/user",
+///             headers: [.authorization: "Bearer 3xpo"],
+///             parameters: ["api_key": "a9a5aac8752afc86"]
+///         ),
+///         baseURL: URL(string: "https://example.com/api")!
+///     )
 ///
-///     HTTPStubProtocol.stubRequest(request, data: json, statusCode: 200)
+/// Or as an error response for the same API request:
 ///
-/// And then pass the `.stubbed` URL session as a parameter when constructing your `APIClient`:
+///     try HTTPStubProtocol.stub(
+///         Error(message: "The resource you requested could not be found."),
+///         statusCode: 404,
+///         for: APIRequest<User, Error>.get(
+///             "/user",
+///             headers: [.authorization: "Bearer 3xpo"],
+///             parameters: ["api_key": "a9a5aac8752afc86"]
+///         ),
+///         baseURL: URL(string: "https://example.com/api")!
+///     )
+///
+/// To use stubbed responses, you need to pass `URLSession.stubbed` as a parameter for
+/// `session:` when constructing the `APIClient`:
 ///
 ///     let apiClient = APIClient(
-///         baseURL: URL(string: "https://example.com")!,
+///         baseURL: URL(string: "https://example.com/api")!,
 ///         configuration: configuration,
 ///         session: .stubbed
 ///     )
@@ -51,19 +70,127 @@ public final class HTTPStubProtocol: URLProtocol {
 
     private static var stubs: [URLRequest: Stub] = [:]
 
-    public static func stubRequest(
-        _ request: URLRequest,
-        data: Data,
+    /// Stubs a valid response for a given API request.
+    ///
+    /// - Parameters:
+    ///   - output: The response to stub.
+    ///   - jsonEncoder: The JSON encoder that is  used to encode the `output` parameter.
+    ///   - statusCode: The HTTP status code for the response.
+    ///   - headers: The HTTP headers for the response.
+    ///   - request: The API request for which the response is stubbed.
+    ///   - baseURL: The base URL for the API request.
+    ///
+    public static func stub<Output, Error>(
+        _ output: Output,
+        jsonEncoder: JSONEncoder = JSONEncoder(),
         statusCode: Int,
-        headers: [String: String]? = nil
-    ) {
-        let response = HTTPURLResponse(
-            url: request.url!,
+        headers: [String: String]? = nil,
+        for request: APIRequest<Output, Error>,
+        baseURL: URL
+    ) throws where Output: Encodable {
+        stub(
+            try jsonEncoder.encode(output),
             statusCode: statusCode,
-            httpVersion: "HTTP/1.1",
-            headerFields: headers
+            headers: headers,
+            for: URLRequest(baseURL: baseURL, apiRequest: request)
         )
-        stubs[request] = Stub(data: data, response: response!)
+    }
+
+    /// Stubs an error response for a given API request.
+    ///
+    /// - Parameters:
+    ///   - error: The error response to stub.
+    ///   - jsonEncoder: The JSON encoder that is  used to encode the `error` parameter.
+    ///   - statusCode: The HTTP status code for the response.
+    ///   - headers: The HTTP headers for the response.
+    ///   - request: The API request for which the error response is stubbed.
+    ///   - baseURL: The base URL for the API request.
+    ///
+    public static func stub<Output, Error>(
+        _ error: Error,
+        jsonEncoder: JSONEncoder = JSONEncoder(),
+        statusCode: Int,
+        headers: [String: String]? = nil,
+        for request: APIRequest<Output, Error>,
+        baseURL: URL
+    ) throws where Error: Encodable {
+        stub(
+            try jsonEncoder.encode(error),
+            statusCode: statusCode,
+            headers: headers,
+            for: URLRequest(baseURL: baseURL, apiRequest: request)
+        )
+    }
+
+    /// Stubs a text response for a given API request.
+    ///
+    /// - Parameters:
+    ///   - text: The text response to stub.
+    ///   - statusCode: The HTTP status code for the response.
+    ///   - headers: The HTTP headers for the response.
+    ///   - request: The API request for which the response is stubbed.
+    ///   - baseURL: The base URL for the API request.
+    ///
+    public static func stub<Output, Error>(
+        _ text: String,
+        statusCode: Int,
+        headers: [String: String]? = nil,
+        for request: APIRequest<Output, Error>,
+        baseURL: URL
+    ) {
+        return stub(
+            text.data(using: .utf8)!,
+            statusCode: statusCode,
+            headers: headers,
+            for: URLRequest(baseURL: baseURL, apiRequest: request)
+        )
+    }
+
+    /// Stubs an empty response with a status code for a given API requests.
+    ///
+    /// - Parameters:
+    ///   - statusCode: The HTTP status code for the response.
+    ///   - headers: The HTTP headers for the response.
+    ///   - request: The API request for which the response is stubbed.
+    ///   - baseURL: The base URL for the API request.
+    ///
+    public static func stub<Error>(
+        statusCode: Int,
+        headers: [String: String]? = nil,
+        for request: APIRequest<Void, Error>,
+        baseURL: URL
+    ) {
+        return stub(
+            Data(),
+            statusCode: statusCode,
+            headers: headers,
+            for: URLRequest(baseURL: baseURL, apiRequest: request)
+        )
+    }
+
+    /// Stubs the specified data as a response for a given URL request.
+    ///
+    /// - Parameters:
+    ///   - data: The data for the response
+    ///   - statusCode: The HTTP status code for the response.
+    ///   - headers: The HTTP headers for the response.
+    ///   - request: The URL request for which the response is stubbed.
+    ///
+    public static func stub(
+        _ data: Data,
+        statusCode: Int,
+        headers: [String: String]? = nil,
+        for request: URLRequest
+    ) {
+        stubs[request] = Stub(
+            data: data,
+            response: HTTPURLResponse(
+                url: request.url!,
+                statusCode: statusCode,
+                httpVersion: "HTTP/1.1",
+                headerFields: headers
+            )!
+        )
     }
 
     public static func removeAllStubs() {
