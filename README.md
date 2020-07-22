@@ -15,8 +15,9 @@ Let's explore all the features using [The Movie Database API](https://developers
 - [Handling errors](#handling-errors)
 - [Combining and transforming responses](#combining-and-transforming-responses)
 - [Logging requests and responses](#logging-requests-and-responses)
-- [Stubbing network requests](#stubbing-network-requests)
+- [Stubbing responses for API requests](#stubbing-responses-for-api-requests)
 - [Installation](#installation)
+- [Related projects](#related-projects)
 - [Help & Feedback](#help--feedback)
 
 ## Configuring the API client
