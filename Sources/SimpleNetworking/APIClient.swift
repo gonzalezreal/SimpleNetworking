@@ -80,7 +80,7 @@
                     logger.debug("\(httpResponse.logDescription(content: data.logDescription))")
 
                     guard 200 ..< 300 ~= httpResponse.statusCode else {
-                        let error = try apiRequest.error(data)
+                        let error = data.isEmpty ? nil : try apiRequest.error(data)
                         throw APIError(statusCode: httpResponse.statusCode, error: error)
                     }
 
