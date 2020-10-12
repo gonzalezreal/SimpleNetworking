@@ -29,9 +29,9 @@ public struct APIError<Error>: Swift.Error {
     public let statusCode: Int
 
     /// The error response.
-    public let error: Error
+    public let error: Error?
 
-    public init(statusCode: Int, error: Error) {
+    public init(statusCode: Int, error: Error?) {
         self.statusCode = statusCode
         self.error = error
     }

@@ -120,6 +120,59 @@
             XCTAssertEqual(404, result?.statusCode)
             XCTAssertEqual(Fixtures.anyError, result?.error)
         }
+
+        func testEmptyErrorResponseReturnsAPIError() {
+            // given
+            givenEmptyErrorResponse()
+            let request = APIRequest<User, Error>.get("/user")
+            let didFail = expectation(description: "didFail")
+            var result: APIError<Error>?
+
+            // when
+            sut.response(for: request)
+                .sink(
+                    receiveCompletion: { completion in
+                        if case let .failure(error) = completion {
+                            result = error.apiError
+                            didFail.fulfill()
+                        }
+                    },
+                    receiveValue: { _ in }
+                )
+                .store(in: &cancellables)
+
+            wait(for: [didFail], timeout: 1)
+
+            // then
+            XCTAssertEqual(404, result?.statusCode)
+            XCTAssertNil(result?.error)
+        }
+
+        func testInvalidErrorResponseReturnsDecodingError() {
+            // given
+            givenInvalidErrorResponse()
+            let request = APIRequest<User, Error>.get("/user")
+            let didFail = expectation(description: "didFail")
+            var result: DecodingError?
+
+            // when
+            sut.response(for: request)
+                .sink(
+                    receiveCompletion: { completion in
+                        if case let .failure(error) = completion {
+                            result = error.decodingError
+                            didFail.fulfill()
+                        }
+                    },
+                    receiveValue: { _ in }
+                )
+                .store(in: &cancellables)
+
+            wait(for: [didFail], timeout: 1)
+
+            // then
+            XCTAssertNotNil(result)
+        }
     }
 
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
@@ -140,6 +193,32 @@
         func givenAnyErrorResponse() throws {
             try HTTPStubProtocol.stub(
                 Fixtures.anyError,
+                statusCode: 404,
+                for: APIRequest<User, Error>.get(
+                    "/user",
+                    headers: [.authorization: "Bearer 3xpo"],
+                    parameters: ["api_key": "test"]
+                ),
+                baseURL: Fixtures.anyBaseURL
+            )
+        }
+
+        func givenEmptyErrorResponse() {
+            HTTPStubProtocol.stub(
+                "",
+                statusCode: 404,
+                for: APIRequest<User, Error>.get(
+                    "/user",
+                    headers: [.authorization: "Bearer 3xpo"],
+                    parameters: ["api_key": "test"]
+                ),
+                baseURL: Fixtures.anyBaseURL
+            )
+        }
+
+        func givenInvalidErrorResponse() {
+            HTTPStubProtocol.stub(
+                "invalid",
                 statusCode: 404,
                 for: APIRequest<User, Error>.get(
                     "/user",
