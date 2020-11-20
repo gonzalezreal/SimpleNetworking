@@ -1,7 +1,6 @@
 # SimpleNetworking
-![Swift 5.2](https://img.shields.io/badge/Swift-5.2-orange.svg)
-![Platforms](https://img.shields.io/badge/platforms-macOS+iOS+tvOS+watchOS-brightgreen.svg?style=flat)
-[![Swift Package Manager](https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat)](https://swift.org/package-manager)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fgonzalezreal%2FSimpleNetworking%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/gonzalezreal/SimpleNetworking)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fgonzalezreal%2FSimpleNetworking%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/gonzalezreal/SimpleNetworking)
 [![Twitter: @gonzalezreal](https://img.shields.io/badge/twitter-@gonzalezreal-blue.svg?style=flat)](https://twitter.com/gonzalezreal)
 
 **SimpleNetworking** is a Swift Package that helps you create scalable API clients, simple and elegantly. It uses [Combine](https://developer.apple.com/documentation/combine) to expose API responses, making it easy to compose and transform them.
