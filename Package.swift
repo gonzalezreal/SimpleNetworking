@@ -14,12 +14,11 @@ let package = Package(
         .library(name: "SimpleNetworking", targets: ["SimpleNetworking"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-log", from: "1.2.0"),
+        // Dependencies declare other packages that this package depends on.
+        // .package(url: /* package url */, from: "1.0.0"),
     ],
     targets: [
-        .target(name: "SimpleNetworking", dependencies: [
-            .product(name: "Logging", package: "swift-log"),
-        ]),
+        .target(name: "SimpleNetworking", dependencies: []),
         .testTarget(name: "SimpleNetworkingTests", dependencies: ["SimpleNetworking"]),
     ]
 )

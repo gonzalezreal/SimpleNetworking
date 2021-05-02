@@ -1,7 +1,7 @@
 //
-// Exports.swift
-//
-// Copyright (c) 2020 Guille Gonzalez
+//  APIClientConsoleLogger.swift
+//  
+// Copyright (c) 2021 Jan Scheithauer
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
@@ -21,4 +21,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-@_exported import Logging
+import Foundation
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+public class APIClientConsoleLogger: APIClientLogger {
+    
+    public init() {}
+    
+    public func log(request: URLRequest) {
+        print(request.logDescription)
+    }
+    
+    public func log(response: HTTPURLResponse, data: Data) {
+        print(response.logDescription(content: data.logDescription))
+    }
+
+}

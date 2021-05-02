@@ -24,7 +24,6 @@
 #if canImport(Combine)
     import Combine
     import Foundation
-    import Logging
 
     /// An `APIClient` is an object that makes requests to an API and handles its responses. It works
     /// in conjunction with the `APIRequest` type, which encapsulates a specific API request as well
@@ -38,7 +37,7 @@
         public let configuration: APIClientConfiguration
 
         /// This logger emits requests and responses at debug level.
-        public var logger = Logger(label: "APIClient")
+        private var logger: APIClientLogger?
 
         private let session: URLSession
 
@@ -52,12 +51,12 @@
             baseURL: URL,
             configuration: APIClientConfiguration = APIClientConfiguration(),
             session: URLSession = URLSession(configuration: .default),
-            logLevel: Logger.Level = .info
+            logger: APIClientLogger? = nil
         ) {
             self.baseURL = baseURL
             self.configuration = configuration
             self.session = session
-            logger.logLevel = logLevel
+            self.logger = logger
         }
 
         /// Returns a publisher that wraps sending an API request and decoding its response.
@@ -71,13 +70,13 @@
                 .addingHeaders(configuration.additionalHeaders)
                 .addingParameters(configuration.additionalParameters)
 
-            logger.debug("\(urlRequest.logDescription)")
+            logger?.log(request: urlRequest)
 
             return session.dataTaskPublisher(for: urlRequest)
                 .tryMap { [logger] data, response in
                     let httpResponse = response as! HTTPURLResponse
 
-                    logger.debug("\(httpResponse.logDescription(content: data.logDescription))")
+                    logger?.log(response: httpResponse, data: data)
 
                     guard 200 ..< 300 ~= httpResponse.statusCode else {
                         let error = data.isEmpty ? nil : try apiRequest.error(data)
